@@ -1,0 +1,76 @@
+$def with (renter, renter_man, groups, people, form, form2, form3)
+<h3>$renter.name</h3>
+<h3>$renter_man.FIO</h3>
+<h3>$renter_man.phone</h3>
+<h4><a href="$renter_man.link">$renter_man.link</a></h4>
+
+<table width="100%">
+    <tr>
+        <td>
+            <form action="/renter/$renter.id/" method="post">
+                $:form.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <td>
+            <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>Наименование</th>
+                </tr>
+                $for gr in groups:
+                <tr>
+                    <td>$gr.id</td>
+                    <td><a href="/renter/$renter.id/$gr.id/">$gr.name</a></td>
+                </tr>
+            </table>
+        </td>
+        <td>
+
+            <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>ФИО</th>
+                    <th>телефон</th>
+                    <th>ссылка в соц.сети</th>
+                </tr>
+                $for p in people:
+                <tr>
+                    <td>$p.id</td>
+                    <td>$p.FIO</td>
+                    <td>$p.phone</td>
+                    <td><a href="$p.link">$p.link</a></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form action="/pays/$renter.id/" method="post">
+                $:form2.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <td>
+            лист оплат
+        </td>
+        <td>
+            информация о стоимости
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form action="/using/$renter.id/" method="post">
+                $:form3.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <td>
+            сведения о занятиях
+        </td>
+        <td>
+            информаци о задолжностях и переплатах
+        </td>
+    </tr>
+</table>
+<a href="/renters/">перейти к списку арендаторов</a>

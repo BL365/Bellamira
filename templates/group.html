@@ -1,0 +1,47 @@
+$def with (renter, renter_man, group, people, form)
+<h3><a href="/renter/$renter.id/">$renter.name</a></h3>
+<h4><a href="$renter_man.link">$renter.link</a></h4>
+<h3>$group.name</h3>
+
+
+<table width="100%">
+    <tr>
+        <td>
+            <form action="/renter/$renter.id/$group.id/" method="post">
+                $:form.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <td>
+            <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>ФИО</th>
+                    <th>телефон</th>
+                    <th>ссылка в соц.сети</th>
+                </tr>
+                $for p in people:
+                <tr>
+                    <td>$p.id</td>
+                    <td>$p.FIO</td>
+                    <td>$p.phone</td>
+                    <td><a href="$p.link">$p.link</a></td>
+                    <td>
+                        <form action="/deletePeopleFromGroup/$renter.id/$group.id/$p.id" method="get">
+                            <input type="submit" value="delete">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+
+        </td>
+        <td>
+
+        </td>
+    </tr>
+</table>
+<a href="/renters/">перейти к списку арендаторов</a>

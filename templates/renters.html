@@ -1,0 +1,32 @@
+$def with (form, renters, db)
+<table width="100%">
+    <tr>
+        <td>
+            <form action="/renters/" method="post">
+    $:form.render()
+    <input type="submit" value="Добавить">
+</form>
+        </td>
+        <td>
+
+<table border="1">
+    <tr>
+        <th>id</th>
+        <th>Наименование</th>
+        <th>телефон</th>
+        <th>ссылка в соц.сети</th>
+    </tr>
+    $for rent in renters:
+    <tr>
+        <td>$rent.id</td>
+        $if rent.name:
+        <td><a href="/renter/$rent.id/">$rent.name</a></td>
+        <td>$rent.phone</td>
+        <td><a href="$rent.link">$rent.link</a></td>
+    </tr>
+</table>
+        </td>
+    </tr>
+
+</table>
+

@@ -1,0 +1,31 @@
+$def with (hall, time_zone, renters_cost, form)
+<h2>$hall.name</h2>
+<h3>$time_zone.days_of_week,</h3>
+<h3>$time_zone.start_time,</h3>
+<h3>$time_zone.end_time,</h3>
+<h3>$time_zone.cost,</h3>
+<table width="100%">
+    <tr>
+        <td>
+             <form action="/rentTimezone/" method="post">
+                $:form.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <td>
+            <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>арендатор</th>
+                    <th>стоимость</th>
+                </tr>
+                $for с in renters_cost:
+                <tr>
+                    <td>$c.id</td>
+                    <td><a href="/renter/$c.id/">$с.name</a></td>
+                    <td>$c.cost</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

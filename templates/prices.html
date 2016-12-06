@@ -1,0 +1,31 @@
+$def with (hall, time_zones, form)
+<h2>$hall.name</h2>
+<table width="100%">
+    <tr>
+        <td>
+            <form action="/hall/$hall.id" method="post">
+                $:form.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <td>
+            <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>день недели</th>
+                    <th>время начала</th>
+                    <th>время окончания</th>
+                    <th>общая стоимость</th>
+                </tr>
+                $for z in time_zones:
+                <tr>
+                    <td><a href="/timezone/$h.id/">$z.id</a></td>
+                    <td>$h.days_of_week</td>
+                    <td>$h.start_time</td>
+                    <td>$h.end_time</td>
+                    <td>$h.cost</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

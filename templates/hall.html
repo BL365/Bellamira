@@ -1,0 +1,32 @@
+$def with (halls, form)
+<table width="100%">
+    <tr>
+        <td>
+            <form action="/halls/" method="post">
+                $:form.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <td>
+            <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>Наименование</th>
+                    <th>Площадь</th>
+
+                </tr>
+                $for h in halls:
+                <tr>
+                    <td>$h.id</td>
+                    <td><a href="/hall/$h.id/">$h.name</a></td>
+                    <td>$h.square</td>
+                    <td>
+                        <form action="/delhall/$h.id" method="get">
+                            <input type="submit" value="delete">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
