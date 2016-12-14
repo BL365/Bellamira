@@ -1,4 +1,11 @@
+# encoding=utf8
+import sys
+
 from db_controller import *
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 
 google_reg = {"web": {"client_id":"890621792831-7gh2uv62k8rpovqs3lrh5bc5q90unh8f.apps.googleusercontent.com",
                       "project_id":"bellamira-146516","auth_uri":"https://accounts.google.com/o/oauth2/auth",
@@ -58,7 +65,8 @@ class DelHall:
         raise web.seeother('/halls/', True)
 
 class Halls:
-    form = web.form.Form(web.form.Textbox('name'), web.form.Textbox('square'))
+    form = web.form.Form(web.form.Textbox('name', description='наименование'),
+                         web.form.Textbox('square', description='площадь'))
 
     def GET(self):
         halls = db.select('hall')
