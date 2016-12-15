@@ -1,13 +1,14 @@
-$def with (hall, time_zones, form)
+$def with (hall, time_zones, form, form2, events)
 <h2>$hall.name</h2>
 <table width="100%">
     <tr>
         <td>
-            <form action="/hall/$hall.id" method="post">
+            <form action="/hall/$hall.id/" method="post">
                 $:form.render()
                 <input type="submit" value="Добавить">
             </form>
         </td>
+
         <td>
             <table border="1">
                 <tr>
@@ -27,5 +28,32 @@ $def with (hall, time_zones, form)
                 </tr>
             </table>
         </td>
+
+         <td>
+             <form action="/hall/$hall.id/" method="post">
+                $:form2.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>мероприятие</th>
+                    <th>руководитель</th>
+                    <th>время начала</th>
+                    <th>время окончания</th>
+
+                </tr>
+                $for e in events:
+                <tr>
+                    <td>$e.id</td>
+                    <td><a href="/events/$e.id/">$e.name</a></td>
+                    <td>$e.event_name</td>
+                    <td>$e.renter_id</td>
+                    <td>$e.start_time</td>
+                    <td>$e.end_time</td>
+                </tr>
+        </table>
     </tr>
+
 </table>

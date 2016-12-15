@@ -38,14 +38,25 @@ class Index:
 
 class Hall:
 
-    form = web.form.Form(web.form.Textbox('days'), web.form.Textbox('startTime'), web.form.Textbox('endTime'),
-                         web.form.Textbox('cost'))
+    form = web.form.Form(
+        web.form.Textbox('days'), web.form.Textbox('startTime'), web.form.Textbox('endTime'),
+                         web.form.Textbox('cost')
+    )
+
+    form2 = web.form.Form(
+        web.form.Textbox('event_name'), web.form.Dropdown('drop', []),
+        web.form.Textbox('start time'), web.form.Textbox('end time')
+    )
 
     def GET(self, hall_id):
         hall = db.select('hall', where='id=$hall_id', vars=locals())[0]
         zones = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
         form = self.form()
-        return render.prices(hall, zones, form)
+        form2 = self.form2()
+        events = []
+        return render.prices(hall, zones, form, form2,  events)
+
+
 
     def POST(self, hall_id):
 
