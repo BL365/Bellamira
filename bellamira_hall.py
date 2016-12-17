@@ -1,11 +1,21 @@
+# encoding=utf8
+import sys
+
+# coding: utf8
+
 from db_controller import *
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
+
+
 
 google_reg = {"web": {"client_id":"890621792831-7gh2uv62k8rpovqs3lrh5bc5q90unh8f.apps.googleusercontent.com",
                       "project_id":"bellamira-146516","auth_uri":"https://accounts.google.com/o/oauth2/auth",
                       "token_uri":"https://accounts.google.com/o/oauth2/token",
                       "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
                       "client_secret":"dcpF93fM7ktZzoXRsX5aUykR"}}
-
 urls = (
     '/', 'Index',
     '/renters/', 'Renters',
@@ -37,10 +47,11 @@ class Index:
 
 
 class Hall:
-
-    form = web.form.Form(web.form.Textbox('days'), web.form.Textbox('startTime'), web.form.Textbox('endTime'),
-                         web.form.Textbox('cost'))
-
+    form = web.form.Form(
+        web.form.Textbox('days', description='день недели'), web.form.Textbox('startTime', description='время начала'),
+        web.form.Textbox('endTime', description='время окончания'),
+        web.form.Textbox('cost', description='общая стоимость')
+    )
     def GET(self, hall_id):
         hall = db.select('hall', where='id=$hall_id', vars=locals())[0]
         zones = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
@@ -48,8 +59,7 @@ class Hall:
         return render.prices(hall, zones, form)
 
     def POST(self, hall_id):
-
-        raise web.seeother('/hall/' + str(hall_id) + "/", True)
+         raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
 class DelHall:
 
@@ -58,7 +68,8 @@ class DelHall:
         raise web.seeother('/halls/', True)
 
 class Halls:
-    form = web.form.Form(web.form.Textbox('name'), web.form.Textbox('square'))
+    form = web.form.Form(web.form.Textbox('name', description='наименование'),
+                         web.form.Textbox('square', description='площадь'))
 
     def GET(self):
         halls = db.select('hall')
@@ -84,9 +95,8 @@ class DeletePeopleFromGroup:
 
 class Group:
 
-    form = web.form.Form(web.form.Dropdown('drop', []), web.form.Textbox('FIO'), web.form.Textbox('phone'),
-                         web.form.Textbox('link')
-                         )
+    form = web.form.Form(web.form.Dropdown('drop', [], description='выберите руководителя'), web.form.Textbox('FIO', description='ФИО руководителя'),
+                         web.form.Textbox('phone', description='телефон'), web.form.Textbox('link', description='ссылка'))
 
     def GET(self, renter_id, group_id):
         people = db.query('Select * from people where id in (select people_id from group_people where group_id='
@@ -116,19 +126,20 @@ class Group:
 class Renter:
 
     form = web.form.Form(
-        web.form.Textbox('name'), web.form.Dropdown('drop', []),
-        web.form.Checkbox('other'), web.form.Textbox('FIO'),
-        web.form.Textbox('phone'), web.form.Textbox('link')
+        web.form.Textbox('name', description='название организации'), web.form.Dropdown('drop', [], description='выберите руководителя'),
+        web.form.Checkbox('other', description='другое'), web.form.Textbox('FIO', description='ФИО руководителя'),
+        web.form.Textbox('phone', description='телефон'), web.form.Textbox('link', description='ссылка')
     )
 
-    form2 = web.form.Form(web.form.Textbox("date"), web.form.Textbox('sum'))
+    form2 = web.form.Form(web.form.Textbox("date", description='дата'), web.form.Textbox('sum', description='общая стоимость'))
 
-    form3 = web.form.Form(web.form.Textbox('name'), web.form.Textbox('startDate'), web.form.Textbox('startTime'),
-                          web.form.Textbox('duration'), web.form.Textbox('endDate'), web.form.Textbox('endTime'))
+    form3 = web.form.Form(web.form.Textbox('name', description='название мероприятия'), web.form.Textbox('startDate', description='дата начала'),
+                          web.form.Textbox('startTime', description='время начала'), web.form.Textbox('duration', description='продолжительность'),
+                          web.form.Textbox('endDate', description='дата окончания'), web.form.Textbox('endTime', description='время окончания'))
 
     def GET(self, renter_id):
         groups = db.select("renters_group", order='name', where='renter_id = $renter_id', vars=locals())
-        people = people = db.query('Select * from people where id in (select people_id from group_people where renter_id = '
+        people = db.query('Select * from people where id in (SELECT people_id FROM group_people WHERE renter_id = '
                                    + str(renter_id) + ')');
         renter = db.select("renters", where="id=$renter_id", vars=locals())[0]
         renter_man = db.select("people", where="id = $renter.people_id", vars=locals())[0]
@@ -163,12 +174,14 @@ class Renter:
 
 
 class Renters:
-
     form = web.form.Form(
-        web.form.Textbox('name'), web.form.Textbox('renter_link'),
-        web.form.Textbox('renter_phone'), web.form.Dropdown('drop', [(-1, "Add")]),
-        web.form.Checkbox('other'), web.form.Textbox('FIO'),
-        web.form.Textbox('phone'), web.form.Textbox('link')
+        web.form.Textbox('name', description='наименование'),
+        web.form.Textbox('renter_link', description='ссылка на организацию'),
+        web.form.Textbox('renter_phone', description='телефон организации'),
+        web.form.Dropdown('drop', [(-1, "Add")], description='руководитель'),
+        web.form.Checkbox('other', description='другое'), web.form.Textbox('FIO', description='ФИО руководителя'),
+        web.form.Textbox('phone', description='телефон руководителя'),
+        web.form.Textbox('link', description='ссылка на руководителя')
     )
 
     def GET(self):
