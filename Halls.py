@@ -22,8 +22,8 @@ class DelHall:
 
 
 class Halls:
-    form = web.form.Form(web.form.Textbox('name', description='Наименование'),
-                         web.form.Textbox('square', description='площадь'))
+    form = web.form.Form(web.form.Textbox('name'),
+                         web.form.Textbox('square'))
 
     def GET(self):
         halls = db.select('hall')
