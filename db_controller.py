@@ -17,3 +17,10 @@ def getdropValues():
     for p in people:
         dropValue.append((p["id"], p["FIO"]))
     return dropValue
+
+def getdropValues2():
+    people = db.select("people", order="FIO")
+    dropValue = [(-1, "Add")]
+    for p in people:
+        dropValue.append((p["FIO"]))
+    return dropValue

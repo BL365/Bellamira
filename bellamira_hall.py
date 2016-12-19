@@ -53,6 +53,7 @@ class Hall:
         zones = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
         form = self.form()
         form2 = self.form2()
+        form2.drop.args = getdropValues2()
         events = db.select('events')
         return render.prices(hall, zones, form, form2,  events)
 
@@ -65,11 +66,14 @@ class Hall:
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
         if not form2.validates():
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
-        element = {"event_name": form2.d.event_name,
+        renter_id = form2.d.drop
+        if renter_id != "-1":
+            element = {"event_name": form2.d.event_name,
                    "start_time": form2.d.start_time,
                    "end_time": form2.d.end_time,
-                   "id": getNextId('events')}
-        db.multiple_insert('events', values=[element])
+                   "renter_id" : renter_id,
+                   "id": getNextId("events")}
+            db.multiple_insert('events', values=[element])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
 class DelHall:
@@ -149,7 +153,7 @@ class Renter:
 
     def GET(self, renter_id):
         groups = db.select("renters_group", order='name', where='renter_id = $renter_id', vars=locals())
-        people = people = db.query('Select * from people where id in (select people_id from group_people where renter_id = '
+        people = db.query('Select * from people where id in (select people_id from group_people where renter_id = '
                                    + str(renter_id) + ')');
         renter = db.select("renters", where="id=$renter_id", vars=locals())[0]
         renter_man = db.select("people", where="id = $renter.people_id", vars=locals())[0]
@@ -179,7 +183,7 @@ class Renter:
                    "renter_id": renter_id,
                    "id": ids}
         db.multiple_insert("renters_group", values=[element])
-        db.insert('group_people', renter_id = renter_id, group_id=ids, people_id=people_id)
+        db.insert('group_people', renter_id=renter_id, group_id=ids, people_id=people_id)
         raise web.seeother('/renter/' + str(renter_id) + "/", True)
 
 
