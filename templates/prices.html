@@ -47,8 +47,7 @@ $def with (hall, time_zones, form, form2, events)
                 $for e in events:
                 <tr>
                     <td>$e.id</td>
-                    <td><a href="/events/$e.id/">$e.name</a></td>
-                    <td>$e.event_name</td>
+                    <td><a href="/events/$e.id/">$e.event_name</a></td>
                     <td>$e.renter_id</td>
                     <td>$e.start_time</td>
                     <td>$e.end_time</td>

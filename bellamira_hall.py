@@ -45,7 +45,7 @@ class Hall:
 
     form2 = web.form.Form(
         web.form.Textbox('event_name'), web.form.Dropdown('drop', []),
-        web.form.Textbox('start time'), web.form.Textbox('end time')
+        web.form.Textbox('start_time'), web.form.Textbox('end_time')
     )
 
     def GET(self, hall_id):
@@ -53,13 +53,23 @@ class Hall:
         zones = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
         form = self.form()
         form2 = self.form2()
-        events = []
+        events = db.select('events')
         return render.prices(hall, zones, form, form2,  events)
 
 
 
     def POST(self, hall_id):
-
+        form = self.form()
+        form2 = self.form2()
+        if not form.validates():
+            raise web.seeother('/hall/' + str(hall_id) + "/", True)
+        if not form2.validates():
+            raise web.seeother('/hall/' + str(hall_id) + "/", True)
+        element = {"event_name": form2.d.event_name,
+                   "start_time": form2.d.start_time,
+                   "end_time": form2.d.end_time,
+                   "id": getNextId('events')}
+        db.multiple_insert('events', values=[element])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
 class DelHall:
