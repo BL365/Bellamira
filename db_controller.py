@@ -19,7 +19,7 @@ def getdropValues():
     return dropValue
 
 def getdropValues2():
-    people = db.query('SELECT renters_group.id AS r_id, renters.name || ", " || renters_group.name as name FROM (renters_group Inner Join renters on r_id = renters.id)')
+    people = db.query('SELECT renters_group.id AS r_id, renters.name || ", " || renters_group.name as name FROM (renters_group Inner Join renters on renters_group.renter_id = renters.id)')
     dropValue = [(-1, "Add")]
     for p in people:
         dropValue.append((p["r_id"], p["name"]))

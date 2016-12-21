@@ -53,9 +53,20 @@ class Hall:
         zones = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
         form = self.form()
         form2 = self.form2()
-        form2.drop.args = getdropValues2()
+        tempo = getdropValues2()
+        form2.drop.args = tempo
         events = db.select('events')
-        return render.prices(hall, zones, form, form2,  events)
+        updeted_events = []
+        for e in events:
+            item = e
+            #print item['renter_id']
+            #print "tempo size: ", tempo.__len__()
+            #print "events group id", e.renter_id
+            for t in tempo:
+                #print "next tempo", t
+                item['renter_id'] = t[1]
+            updeted_events.append(item)
+        return render.prices(hall, zones, form, form2, updeted_events)
 
 
 
