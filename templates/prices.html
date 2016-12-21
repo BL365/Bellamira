@@ -28,13 +28,15 @@ $def with (hall, time_zones, form, form2, events)
                 </tr>
             </table>
         </td>
-
-         <td>
+    </tr>
+    <tr>
+        <td>
              <form action="/hall/$hall.id/" method="post">
                 $:form2.render()
                 <input type="submit" value="Добавить">
             </form>
         </td>
+        <td>
         <table border="1">
                 <tr>
                     <th>id</th>
@@ -53,6 +55,7 @@ $def with (hall, time_zones, form, form2, events)
                     <td>$e.end_time</td>
                 </tr>
         </table>
+        </td>
     </tr>
 
 </table>
