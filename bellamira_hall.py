@@ -44,7 +44,7 @@ class Hall:
     )
 
     form2 = web.form.Form(
-        web.form.Textbox('event_name'), web.form.Dropdown('drop', []),
+        web.form.Textbox('name'), web.form.Dropdown('drop', []),
         web.form.Textbox('start_time'), web.form.Textbox('end_time')
     )
 
@@ -56,14 +56,14 @@ class Hall:
         form2 = self.form2()
         tempo = getdropValues2()
         form2.drop.args = tempo
-        events = db.select('events')
+        events = db.select('using_hall')
         updeted_events = []
 
         for e in events:
             item = e
             for t in tempo:
-                if t[0] == item['renter_id']:
-                    item['renter_id'] = t[1]
+                if t[0] == item['group_id']:
+                    item['group_id'] = t[1]
                     updeted_events.append(item)
 
         return render.prices(hall, zones, form, form2, updeted_events)
@@ -77,14 +77,15 @@ class Hall:
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
         if not form2.validates():
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
-        renter_id = form2.d.drop
-        if renter_id != "-1":
-            element = {"event_name": form2.d.event_name,
-                   "start_time": form2.d.start_time,
-                   "end_time": form2.d.end_time,
-                   "renter_id" : renter_id,
-                   "id": getNextId("events")}
-            db.multiple_insert('events', values=[element])
+        group_id = form2.d.drop
+        if group_id != "-1":
+            element = {"id": getNextId("using_hall"),
+                       "name": form2.d.name,
+                       "group_id": group_id,
+                       "hall_id": hall_id,
+                       "start_time": form2.d.start_time,
+                       "end_time": form2.d.end_time}
+            db.multiple_insert('using_hall', values=[element])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
 class DelHall:

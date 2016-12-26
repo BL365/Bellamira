@@ -1,4 +1,4 @@
-$def with (hall, time_zones, form, form2, events)
+$def with (hall, time_zones, form, form2, updeted_events)
 <h2>$hall.name</h2>
 <table width="100%">
     <tr>
@@ -41,16 +41,18 @@ $def with (hall, time_zones, form, form2, events)
                 <tr>
                     <th>id</th>
                     <th>мероприятие</th>
-                    <th>руководитель</th>
+                    <th>группа</th>
+                    <th>зал</th>
                     <th>время начала</th>
                     <th>время окончания</th>
 
                 </tr>
-                $for e in events:
+                $for e in updeted_events:
                 <tr>
                     <td>$e.id</td>
-                    <td><a href="/events/$e.id/">$e.event_name</a></td>
-                    <td>$e.renter_id</td>
+                    <td><a href="/using_hall/$e.id/">$e.name</a></td>
+                    <td>$e.group_id</td>
+                    <td>$e.hall_id</td>
                     <td>$e.start_time</td>
                     <td>$e.end_time</td>
                 </tr>

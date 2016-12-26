@@ -49,6 +49,7 @@ class dbCreator:
 
     createTableHallUsingSQL = """CREATE TABLE IF NOT EXISTS using_hall (
         id INT AUTO_INCREMENT,
+        name TEXT,
         group_id INT,
         hall_id INT,
         start_time INT,
@@ -76,15 +77,6 @@ class dbCreator:
         cost REAL,
         primary key (id)
     )"""
-
-    createTableEventsSQL = """CREATE TABLE IF NOT EXISTS events (
-            id INT AUTO_INCREMENT,
-            event_name TEXT,
-            renter_id INT,
-            start_time INT,
-            end_time INT,
-            primary key (id)
-        )"""
 
     createTablePaysSQL = """CREATE TABLE IF NOT EXISTS pays (
         id INT AUTO_INCREMENT,
@@ -125,7 +117,6 @@ class dbCreator:
             conn.execute(self.createTableHallPriceSQL)
             conn.execute(self.createTableHallUsingSQL)
             conn.execute(self.createTablePaysSQL)
-            conn.execute(self.createTableEventsSQL)
 
         except OperationalError, msg:
             print msg
