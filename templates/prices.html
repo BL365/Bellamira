@@ -47,7 +47,7 @@ $def with (hall, time_zones, form, form2, updeted_events)
                     <th>время окончания</th>
 
                 </tr>
-                $for e in updeted_events:
+                $for e in updeted_events
                 <tr>
                     <td>$e.id</td>
                     <td><a href="/using_hall/$e.id/">$e.name</a></td>

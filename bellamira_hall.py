@@ -56,7 +56,7 @@ class Hall:
         form2 = self.form2()
         tempo = getdropValues2()
         form2.drop.args = tempo
-        events = db.select('using_hall')
+        events = db.select('using_hall', where='hall_id=$hall_id', vars=locals())
         updeted_events = []
 
         for e in events:
