@@ -1,5 +1,9 @@
 from db_controller import *
 
+from datetime import *
+
+import time
+
 google_reg = {"web": {"client_id":"890621792831-7gh2uv62k8rpovqs3lrh5bc5q90unh8f.apps.googleusercontent.com",
                       "project_id":"bellamira-146516","auth_uri":"https://accounts.google.com/o/oauth2/auth",
                       "token_uri":"https://accounts.google.com/o/oauth2/token",
@@ -45,7 +49,8 @@ class Hall:
 
     form2 = web.form.Form(
         web.form.Textbox('name'), web.form.Dropdown('drop', []),
-        web.form.Textbox('start_time'), web.form.Textbox('end_time')
+        web.form.Textbox('start_time', size="16", maxlength="16"),
+        web.form.Textbox('end_time', pattern="\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2}", size="16", maxlength="16")
     )
 
     def GET(self, hall_id):
@@ -78,13 +83,19 @@ class Hall:
         if not form2.validates():
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
         group_id = form2.d.drop
+
+        start_dt_string = datetime.strptime(form2.d.start_time, "%d/%m/%Y %H:%M")
+        start_dt_unix = time.mktime(start_dt_string.timetuple())
+        end_dt_string = datetime.strptime(form2.d.end_time, "%d/%m/%Y %H:%M")
+        end_dt_unix = time.mktime(end_dt_string.timetuple())
+
         if group_id != "-1":
             element = {"id": getNextId("using_hall"),
                        "name": form2.d.name,
                        "group_id": group_id,
                        "hall_id": hall_id,
-                       "start_time": form2.d.start_time,
-                       "end_time": form2.d.end_time}
+                       "start_time": start_dt_unix,
+                       "end_time": end_dt_unix}
             db.multiple_insert('using_hall', values=[element])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
