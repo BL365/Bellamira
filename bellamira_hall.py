@@ -4,6 +4,9 @@ from datetime import *
 
 import time
 
+import json
+
+
 google_reg = {"web": {"client_id":"890621792831-7gh2uv62k8rpovqs3lrh5bc5q90unh8f.apps.googleusercontent.com",
                       "project_id":"bellamira-146516","auth_uri":"https://accounts.google.com/o/oauth2/auth",
                       "token_uri":"https://accounts.google.com/o/oauth2/token",
@@ -21,7 +24,8 @@ urls = (
     '/hall/(\\d+)/(\\d+)/', 'Timezone',
     '/rentTimezone/', 'RentTimezone',
     '/delhall/(\\d+)?', 'DelHall',
-    '/deltimezone/(\\d+)/(\\d+)?', 'DelTimezone'
+    '/deltimezone/(\\d+)/(\\d+)?', 'DelTimezone',
+    '/prices/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d+)/', 'CheckTime'
 )
 
 dbCreator().execute()
@@ -49,8 +53,8 @@ class Hall:
 
     form2 = web.form.Form(
         web.form.Textbox('name'), web.form.Dropdown('drop', []),
-        web.form.Textbox('start_time', size="16", maxlength="16"),
-        web.form.Textbox('end_time', pattern="\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2}", size="16", maxlength="16")
+        web.form.Textbox('start_time', size="16", maxlength="16", id="st_t"),
+        web.form.Textbox('end_time', pattern="\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2}", size="16", maxlength="16", id="end_t")
     )
 
     def GET(self, hall_id):
@@ -65,11 +69,12 @@ class Hall:
         updeted_events = []
 
         for e in events:
-            item = e
+            e['start_time'] = datetime.fromtimestamp(e['start_time']).strftime("%d/%m/%Y (%a) %H:%M")
+            e['end_time'] = datetime.fromtimestamp(e['end_time']).strftime("%d/%m/%Y (%a) %H:%M")
             for t in tempo:
-                if t[0] == item['group_id']:
-                    item['group_id'] = t[1]
-                    updeted_events.append(item)
+                if t[0] == e['group_id']:
+                    e['group_id'] = t[1]
+                    updeted_events.append(e)
 
         return render.prices(hall, zones, form, form2, updeted_events)
 
@@ -98,6 +103,60 @@ class Hall:
                        "end_time": end_dt_unix}
             db.multiple_insert('using_hall', values=[element])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
+
+class CheckTime:
+
+    def GET(self, st_new, en_new, hall_id):
+
+        start_old = db.query('SELECT start_time FROM using_hall where hall_id=' + str(hall_id))
+        end_old = db.query('SELECT end_time FROM using_hall where hall_id=' + str(hall_id))
+
+        st_new = datetime.strptime(st_new, "%d/%m/%Y %H:%M")
+        st_new = time.mktime(st_new.timetuple())
+        en_new = datetime.strptime(en_new, "%d/%m/%Y %H:%M")
+        en_new = time.mktime(en_new.timetuple())
+
+        dif_eN_sO = []
+        start_times_old = []
+        for a in start_old:
+            z = en_new - a['start_time']
+            start_times_old.append(a['start_time'])
+            dif_eN_sO.append(z)
+
+        dif_eO_sN = []
+        end_times_old = []
+        for a in end_old:
+            z = a['end_time'] - st_new
+            dif_eO_sN.append(z)
+            end_times_old.append(a['end_time'])
+
+        res = "Time "
+
+        if max(end_times_old) < st_new:
+            res = res + "start - correctly,"
+            if st_new < en_new:
+                res = res + " time end - correctly"
+            else:
+                res = res + " time end - incorrectly"
+        else:
+            if en_new < min(start_times_old):
+                res = res + " end - correctly,"
+                if st_new < en_new:
+                    res = res + " start - correctly"
+                else:
+                    res = res + " start - incorrectly"
+                if min(dif_eO_sN) <= 0:
+                    res = res + "start - correctly,"
+                else:
+                    res = res + "start - incorrectly,"
+                if min(dif_eN_sO) <= 0:
+                     res = res + " time end - correctly"
+                else:
+                    res = res + " time end - incorrectly"
+
+        return (json.dumps({'res': res}))
+
+
 
 class DelHall:
 
