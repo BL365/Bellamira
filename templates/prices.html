@@ -5,7 +5,7 @@ $def with (hall, time_zones, form, form2, updeted_events)
         <td>
             <form action="/hall/$hall.id/" method="post">
                 $:form.render()
-                <input type="submit" value="Добавить">
+                <input type="button" value="Добавить">
             </form>
         </td>
 
@@ -33,7 +33,7 @@ $def with (hall, time_zones, form, form2, updeted_events)
         <td>
             <form action="/hall/$hall.id/" method="post">
                 $:form2.render()
-                <input type="submit" value="Добавить" onclick="A();">
+                <input type="button" value="Добавить" onsubmit="A();">
             </form>
         </td>
         <td>
@@ -60,13 +60,14 @@ $def with (hall, time_zones, form, form2, updeted_events)
         </td>
     </tr>
     <script>
-        var stT = document.getElementById('st_t').value, enT = document.getElementById('end_t').value
-
+        var str1 = document.getElementById('st_t').value
+        var str2 = document.getElementById('end_t').value
+        var str = str1 + "/" + str2;
         A = function() {
             jQuery.getJSON(
-            "/prices/11/11/2017 13:00/11/11/2017 15:00/$hall.id/",
+            "/prices/str/$hall.id/",
             function(json) {
-                    alert(json.res)
+                    return (json.result)
             });
         }
     </script>

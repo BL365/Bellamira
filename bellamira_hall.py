@@ -25,7 +25,7 @@ urls = (
     '/rentTimezone/', 'RentTimezone',
     '/delhall/(\\d+)?', 'DelHall',
     '/deltimezone/(\\d+)/(\\d+)?', 'DelTimezone',
-    '/prices/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d+)/', 'CheckTime'
+    '/prices/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d+)/','CheckTime'
 )
 
 dbCreator().execute()
@@ -44,7 +44,7 @@ class Index:
         raise web.seeother('/', True)
 
 
-class Hall:
+class Hall():
 
     form = web.form.Form(
         web.form.Textbox('days'), web.form.Textbox('startTime'), web.form.Textbox('endTime'),
@@ -53,7 +53,7 @@ class Hall:
 
     form2 = web.form.Form(
         web.form.Textbox('name'), web.form.Dropdown('drop', []),
-        web.form.Textbox('start_time', size="16", maxlength="16", id="st_t"),
+        web.form.Textbox('start_time', pattern="\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2}", size="16", maxlength="16", id="st_t"),
         web.form.Textbox('end_time', pattern="\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2}", size="16", maxlength="16", id="end_t")
     )
 
@@ -104,7 +104,7 @@ class Hall:
             db.multiple_insert('using_hall', values=[element])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
-class CheckTime:
+class CheckTime():
 
     def GET(self, st_new, en_new, hall_id):
 
@@ -133,30 +133,36 @@ class CheckTime:
         res = "Time "
 
         if max(end_times_old) < st_new:
-            res = res + "start - correctly,"
+            ST = 1
             if st_new < en_new:
-                res = res + " time end - correctly"
+                EN = 1
             else:
-                res = res + " time end - incorrectly"
+                res = res + "end - incorrectly "
+                EN = 0
         else:
             if en_new < min(start_times_old):
-                res = res + " end - correctly,"
+                EN = 1
                 if st_new < en_new:
-                    res = res + " start - correctly"
+                    ST = 1
                 else:
-                    res = res + " start - incorrectly"
+                    res = res + "start - incorrectly "
+                    ST = 0
                 if min(dif_eO_sN) <= 0:
-                    res = res + "start - correctly,"
+                    ST = 1
                 else:
-                    res = res + "start - incorrectly,"
+                    res = res + "start - incorrectly "
+                    ST = 0
                 if min(dif_eN_sO) <= 0:
-                     res = res + " time end - correctly"
+                     EN = 1
                 else:
-                    res = res + " time end - incorrectly"
+                    res = res + "end - incorrectly "
+                    EN = 0
 
-        return (json.dumps({'res': res}))
 
+        result = ST == 0 and EN == 0
+        print result
 
+        return (json.dumps({'result': result}))
 
 class DelHall:
 
