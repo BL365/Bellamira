@@ -1,11 +1,13 @@
 $def with (hall, time_zones, form, form2, updeted_events)
+<script type="text/javascript" src="/static/jquery.js"></script>
+<script type="text/javascript" src="/static/prices_script.js"></script>
 <h2>$hall.name</h2>
 <table width="100%">
     <tr>
         <td>
             <form action="/hall/$hall.id/" method="post">
                 $:form.render()
-                <input type="button" value="Добавить">
+                <input type="button" value="Добавить" onsubmit="A()">
             </form>
         </td>
 
@@ -59,18 +61,6 @@ $def with (hall, time_zones, form, form2, updeted_events)
             </table>
         </td>
     </tr>
-    <script>
-        var str1 = document.getElementById('st_t').value
-        var str2 = document.getElementById('end_t').value
-        var str = str1 + "/" + str2;
-        A = function() {
-            jQuery.getJSON(
-            "/prices/str/$hall.id/",
-            function(json) {
-                    return (json.result)
-            });
-        }
-    </script>
     <tr>
         <a href="/halls/">Вернуться к списку залов</a>
     </tr>
