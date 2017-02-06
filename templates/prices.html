@@ -5,9 +5,9 @@ $def with (hall, time_zones, form, form2, updeted_events)
 <table width="100%">
     <tr>
         <td>
-            <form action="/hall/$hall.id/" method="post">
+            <form action="/hall/$hall.id/" method="post" onsubmit="A($hall.id);">
                 $:form.render()
-                <input type="button" value="Добавить" onsubmit="A()">
+                <input type="button" value="Добавить">
             </form>
         </td>
 
@@ -33,9 +33,9 @@ $def with (hall, time_zones, form, form2, updeted_events)
     </tr>
     <tr>
         <td>
-            <form action="/hall/$hall.id/" method="post">
+            <form action="/hall/$hall.id/" method="post" onsubmit="A($hall.id);">
                 $:form2.render()
-                <input type="button" value="Добавить" onsubmit="A();">
+                <input type="submit" value="Добавить">
             </form>
         </td>
         <td>
