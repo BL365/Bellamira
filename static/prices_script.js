@@ -3,7 +3,9 @@ A = function(hall) {
     jQuery.getJSON(
         str,
         function(json) {
-                return (json.result);
+                res = (json.result);
+                if (res == true) {
+                    document.getElementById('form0').submit();
+                }
     });
-    return (json.result);
 }

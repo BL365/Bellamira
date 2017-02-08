@@ -131,7 +131,8 @@ class CheckTime():
             end_times_old.append(a['end_time'])
 
         res = "Time "
-
+        ST = 3
+        EN = 3
         if max(end_times_old) < st_new:
             ST = 1
             if st_new < en_new:
