@@ -108,59 +108,24 @@ class CheckTime():
 
     def GET(self, st_new, en_new, hall_id):
 
-        start_old = db.query('SELECT start_time FROM using_hall where hall_id=' + str(hall_id))
-        end_old = db.query('SELECT end_time FROM using_hall where hall_id=' + str(hall_id))
+        print st_new, en_new
+        TIME_old = db.query('SELECT start_time, end_time FROM using_hall where hall_id=' + str(hall_id))
 
         st_new = datetime.strptime(st_new, "%d/%m/%Y %H:%M")
         st_new = time.mktime(st_new.timetuple())
         en_new = datetime.strptime(en_new, "%d/%m/%Y %H:%M")
         en_new = time.mktime(en_new.timetuple())
 
-        dif_eN_sO = []
-        start_times_old = []
-        for a in start_old:
-            z = en_new - a['start_time']
-            start_times_old.append(a['start_time'])
-            dif_eN_sO.append(z)
+        result = True
 
-        dif_eO_sN = []
-        end_times_old = []
-        for a in end_old:
-            z = a['end_time'] - st_new
-            dif_eO_sN.append(z)
-            end_times_old.append(a['end_time'])
+        for t in TIME_old:
+            print t["start_time"], ">=", en_new,"(", t["start_time"] >= en_new,") or", t["end_time"], "<=", st_new, "(",t["end_time"] <= st_new,")"
+            if not (t["start_time"] >= en_new or t["end_time"] <= st_new):
 
-        res = "Time "
-        ST = 3
-        EN = 3
-        if max(end_times_old) < st_new:
-            ST = 1
-            if st_new < en_new:
-                EN = 1
-            else:
-                res = res + "end - incorrectly "
-                EN = 0
-        else:
-            if en_new < min(start_times_old):
-                EN = 1
-                if st_new < en_new:
-                    ST = 1
-                else:
-                    res = res + "start - incorrectly "
-                    ST = 0
-                if min(dif_eO_sN) <= 0:
-                    ST = 1
-                else:
-                    res = res + "start - incorrectly "
-                    ST = 0
-                if min(dif_eN_sO) <= 0:
-                     EN = 1
-                else:
-                    res = res + "end - incorrectly "
-                    EN = 0
+                result = False
+                print "        time is busy:         ", t["start_time"],">", en_new," or",  t["end_time"], "<", st_new
+                break
 
-
-        result = ST == 0 and EN == 0
         print result
 
         return (json.dumps({'result': result}))

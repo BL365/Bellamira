@@ -33,7 +33,7 @@ $def with (hall, time_zones, form, form2, updeted_events)
     </tr>
     <tr>
         <td>
-            <form action="/hall/$hall.id/" method="post" onsubmit="A($hall.id);" id="form0">
+            <form action="/hall/$hall.id/" method="post" onsubmit="return A($hall.id);" id="form0">
                 $:form2.render()
                 <input type="submit" value="Добавить">
             </form>

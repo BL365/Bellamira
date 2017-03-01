@@ -6,6 +6,9 @@ A = function(hall) {
                 res = (json.result);
                 if (res == true) {
                     document.getElementById('form0').submit();
+                } else {
+                    alert("Указанное вемя занято");
                 }
     });
+    return false;
 }
