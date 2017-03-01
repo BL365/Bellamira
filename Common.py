@@ -1,6 +1,4 @@
-
-
-
+from db_controller import *
 
 urls = (
     '/', 'Index',
@@ -16,3 +14,5 @@ urls = (
     '/deltimezone/(\\d+)/(\\d+)?', 'DelTimezone',
     '/prices/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d+)/', 'CheckTime'
 )
+
+render = web.template.render('templates', base='base')
