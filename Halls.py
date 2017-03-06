@@ -8,8 +8,8 @@ import time
 class Hall():
 
     form = web.form.Form(
-        web.form.Textbox('days'), web.form.Textbox('startTime'),
-        web.form.Textbox('endTime'), web.form.Textbox('cost')
+        web.form.Textbox('days'), web.form.Textbox('startTime', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
+        web.form.Textbox('endTime', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"), web.form.Textbox('cost')
     )
 
     form2 = web.form.Form(
@@ -23,9 +23,20 @@ class Hall():
         zones = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
         form = self.form()
 
-        # for t in zones:
-        #     t['start_time'] = datetime.fromtimestamp(t['start_time']).strftime("%H:%M")
-        #     t['end_time'] = datetime.fromtimestamp(t['end_time']).strftime("%H:%M")
+        updeted_zones = []
+
+        for t in zones:
+            hours = t['start_time'] / 3600
+            minutes = t['start_time'] % 3600 / 60
+            t['start_time'] = str(hours) + ":" + str(minutes)
+
+            hours2 = t['end_time'] / 3600
+            minutes2 = t['end_time'] % 3600 / 60
+            t['end_time'] = str(hours2) + ":" + str(minutes2)
+
+            updeted_zones.append(t)
+
+
 
         form2 = self.form2()
         temp = getdropValues2()
@@ -41,7 +52,7 @@ class Hall():
                     e['group_id'] = t[1]
                     updeted_events.append(e)
 
-        return render.prices(hall, zones, form, form2, updeted_events)
+        return render.prices(hall, updeted_zones, form, form2, updeted_events)
 
 
 
@@ -54,27 +65,17 @@ class Hall():
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
         group_id = form2.d.drop
 
-        # start_dt_string = datetime.strptime(form.d.startTime, "%%H:%M")
-        # start_dt_unix = time.mktime(start_dt_string.timetuple())
-        # end_dt_string = datetime.strptime(form.d.endTime, "%H:%M")
-        # end_dt_unix = time.mktime(end_dt_string.timetuple())
-
-        # if group_id != "-1":
-        #     element = {"id": getNextId("time_zone"),
-        #                "hall_id": hall_id,
-        #                "days_of_week": form.d.days,
-        #                "start_time": start_dt_unix,
-        #                "end_time": end_dt_unix,
-        #                "cost": form.d.cost}
-        #     db.multiple_insert('time_zone', values=[element])
-        # raise web.seeother('/hall/' + str(hall_id) + "/", True)
+        stT = form.d.startTime
+        enT = form.d.endTime
+        stSec = int(stT[0:2]) * 3600 + int(stT[3:5]) * 60
+        enSec = int(enT[0:2]) * 3600 + int(enT[3:5]) * 60
 
         if group_id != "-1":
             element = {"id": getNextId("time_zone"),
                        "hall_id": hall_id,
                        "days_of_week": form.d.days,
-                       "start_time": form.d.startTime,
-                       "end_time": form.d.endTime,
+                       "start_time": stSec,
+                       "end_time": enSec,
                        "cost": form.d.cost}
             db.multiple_insert('time_zone', values=[element])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
@@ -118,8 +119,3 @@ class Halls:
                        "id": getNextId('hall')}
         db.multiple_insert('hall', values=[element])
         raise web.seeother('/halls/', True)
-#
-# class Timezone():
-#
-#     def GET(self, hall_id, cost):
-#

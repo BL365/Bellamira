@@ -15,7 +15,6 @@ $def with (hall, time_zones, form, form2, updeted_events)
             <table border="1">
                 <tr>
                     <th>id</th>
-                    <th>ВРЕМЕННОЕ</th>
                     <th>день недели</th>
                     <th>время начала</th>
                     <th>время окончания</th>
@@ -23,12 +22,11 @@ $def with (hall, time_zones, form, form2, updeted_events)
                 </tr>
                 $for z in time_zones:
                 <tr>
-                    <td><a href="/timezone/$h.id/">$z.id</a></td>
-                    <td>$h.hall_id</td>
-                    <td>$h.days_of_week</td>
-                    <td>$h.start_time</td>
-                    <td>$h.end_time</td>
-                    <td>$h.cost</td>
+                    <td><a href="/timezone/$z.id/"></a>$z.id</td>
+                    <td>$z.days_of_week</td>
+                    <td>$z.start_time</td>
+                    <td>$z.end_time</td>
+                    <td>$z.cost</td>
                 </tr>
             </table>
         </td>
