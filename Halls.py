@@ -28,15 +28,13 @@ class Hall():
         for t in zones:
             hours = t['start_time'] / 3600
             minutes = t['start_time'] % 3600 / 60
-            t['start_time'] = str(hours) + ":" + str(minutes)
+            t['start_time'] = "%02d:%02d" % (hours, minutes)
 
             hours2 = t['end_time'] / 3600
             minutes2 = t['end_time'] % 3600 / 60
-            t['end_time'] = str(hours2) + ":" + str(minutes2)
+            t['end_time'] = "%02d:%02d" % (hours, minutes)
 
             updeted_zones.append(t)
-
-
 
         form2 = self.form2()
         temp = getdropValues2()
@@ -79,7 +77,6 @@ class Hall():
                        "cost": form.d.cost}
             db.multiple_insert('time_zone', values=[element])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
-
 
         start_dt_string2 = datetime.strptime(form2.d.start_time, "%d/%m/%Y %H:%M")
         start_dt_unix2 = time.mktime(start_dt_string2.timetuple())
