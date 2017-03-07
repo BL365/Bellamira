@@ -1,4 +1,4 @@
-$def with (renter, renter_man, groups, people, form, form2, form3)
+$def with (renter, renter_man, groups, people, rate, form, form2, form3, form4)
 <h3>$renter.name</h3>
 <h3>$renter_man.FIO</h3>
 <h3>$renter_man.phone</h3>
@@ -64,6 +64,31 @@ $def with (renter, renter_man, groups, people, form, form2, form3)
                 $:form3.render()
                 <input type="submit" value="Добавить">
             </form>
+        </td>
+        <td>
+            <form action="/renter/$renter.id/" method="post">
+                $:form4.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <td>
+            <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>Зал</th>
+                    <th>Время Начала</th>
+                    <th>Время Окончания</th>
+                    <th>Стоимость</th>
+                </tr>
+                $for r in rate:
+                <tr>
+                    <td>$r.id</td>
+                    <td>$r.hall_id</td>
+                    <td>$r.start_time</td>
+                    <td>$r.end_time</td>
+                    <td>$r.cost</td>
+                </tr>
+            </table>
         </td>
         <td>
             сведения о занятиях

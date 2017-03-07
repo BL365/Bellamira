@@ -24,3 +24,10 @@ def getdropValues2():
     for p in people:
         dropValue.append((p["r_id"], p["name"]))
     return dropValue
+
+def getdropValues3():
+    hall = db.select("hall", order="name")
+    dropValue = [(-1, "Add")]
+    for h in hall:
+        dropValue.append((h["id"], h["name"]))
+    return dropValue

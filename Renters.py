@@ -13,6 +13,9 @@ class Renter:
     form3 = web.form.Form(web.form.Textbox('name'), web.form.Textbox('startDate'), web.form.Textbox('startTime'),
                           web.form.Textbox('duration'), web.form.Textbox('endDate'), web.form.Textbox('endTime'))
 
+    form4 = web.form.Form(web.form.Dropdown('drop', []), web.form.Textbox('startTime'), web.form.Textbox('endTime'),
+                          web.form.Textbox('cost'))
+
     def GET(self, renter_id):
         groups = db.select("renters_group", order='name', where='renter_id = $renter_id', vars=locals())
         people = db.query('Select * from people where id in (select people_id from group_people where renter_id = '
@@ -23,7 +26,25 @@ class Renter:
         form.drop.args = getdropValues()
         form2 = self.form2()
         form3 = self.form3()
-        return render.renter(renter, renter_man, groups, people, form, form2, form3)
+        form4 = self.form4()
+        form4.drop.args = getdropValues3()
+
+        rate = db.select("rate_renter", where='renter_id=$renter_id', vars=locals()) [0]
+
+        updated_rate = []
+
+        for r in rate:
+            hours = r['start_time'] / 3600
+            minutes = r['start_time'] % 3600 / 60
+            r['start_time'] = "%02d:%02d" % (hours, minutes)
+
+            hours2 = r['end_time'] / 3600
+            minutes2 = r['end_time'] % 3600 / 60
+            r['end_time'] = "%02d:%02d" % (hours, minutes)
+
+            updated_rate.append(r)
+
+        return render.renter(renter, renter_man, groups, people, updated_rate, form, form2, form3, form4)
 
     def POST(self, renter_id):
         form = self.form()
@@ -48,6 +69,28 @@ class Renter:
         db.insert('group_people', renter_id=renter_id, group_id=ids, people_id=people_id)
         raise web.seeother('/renter/' + str(renter_id) + "/", True)
 
+        form4 = self.form4()
+        if not form4.validates():
+            raise web.seeother('/renter/' + str(renter_id) + "/", True)
+
+        rate_id = getNextId('rate_renter')
+        HALL_ID = form4.d.drop
+
+        stT = form4.d.startTime
+        enT = form4.d.endTime
+        stSec = int(stT[0:2]) * 3600 + int(stT[3:5]) * 60
+        enSec = int(enT[0:2]) * 3600 + int(enT[3:5]) * 60
+
+        if HALL_ID != "-1":
+            element2 = {"hall_id": HALL_ID,
+                        "renter_id": renter_id,
+                        "start_time": stSec,
+                        "end_time": enSec,
+                        "cost": form4.d.cost,
+                        "id": rate_id
+                       }
+            db.multiple_insert('rate_renter', values=[element2])
+        raise web.seeother('/renter/' + str(renter_id) + "/", True)
 
 class Renters:
 

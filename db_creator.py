@@ -78,6 +78,16 @@ class dbCreator:
         primary key (id)
     )"""
 
+    createTableRateRenter = """CREATE TABLE IF NOT EXISTS rate_renter (
+        id INT AUTO_INCREMENT,
+        hall_id TEXT,
+        renter_id int
+        start_time int
+        end_time int
+        cost REAL,
+        prymary key (id)
+    )"""
+
     createTablePaysSQL = """CREATE TABLE IF NOT EXISTS pays (
         id INT AUTO_INCREMENT,
         date INT,
@@ -103,6 +113,8 @@ class dbCreator:
     )"""
 
 
+
+
     def execute(self):
         conn = sqlite3.connect(self.dbName)
         try:
@@ -117,6 +129,7 @@ class dbCreator:
             conn.execute(self.createTableHallPriceSQL)
             conn.execute(self.createTableHallUsingSQL)
             conn.execute(self.createTablePaysSQL)
+            conn.execute(self.createTableRateRenter)
 
         except OperationalError, msg:
             print msg
