@@ -80,12 +80,12 @@ class dbCreator:
 
     createTableRateRenter = """CREATE TABLE IF NOT EXISTS rate_renter (
         id INT AUTO_INCREMENT,
-        hall_id TEXT,
-        renter_id int
-        start_time int
-        end_time int
+        hall_id INT,
+        renter_id INT,
+        start_time INT,
+        end_time INT,
         cost REAL,
-        prymary key (id)
+        primary key (id)
     )"""
 
     createTablePaysSQL = """CREATE TABLE IF NOT EXISTS pays (

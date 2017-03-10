@@ -13,8 +13,8 @@ class Renter:
     form3 = web.form.Form(web.form.Textbox('name'), web.form.Textbox('startDate'), web.form.Textbox('startTime'),
                           web.form.Textbox('duration'), web.form.Textbox('endDate'), web.form.Textbox('endTime'))
 
-    form4 = web.form.Form(web.form.Dropdown('drop', []), web.form.Textbox('startTime'), web.form.Textbox('endTime'),
-                          web.form.Textbox('cost'))
+    form4 = web.form.Form(web.form.Dropdown('drop', []), web.form.Textbox('startTime', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
+                          web.form.Textbox('endTime', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"), web.form.Textbox('cost'))
 
     def GET(self, renter_id):
         groups = db.select("renters_group", order='name', where='renter_id = $renter_id', vars=locals())
@@ -29,7 +29,7 @@ class Renter:
         form4 = self.form4()
         form4.drop.args = getdropValues3()
 
-        rate = db.select("rate_renter", where='renter_id=$renter_id', vars=locals()) [0]
+        rate = db.select('rate_renter', where='renter_id=$renter_id', vars=locals())
 
         updated_rate = []
 
@@ -40,7 +40,7 @@ class Renter:
 
             hours2 = r['end_time'] / 3600
             minutes2 = r['end_time'] % 3600 / 60
-            r['end_time'] = "%02d:%02d" % (hours, minutes)
+            r['end_time'] = "%02d:%02d" % (hours2, minutes2)
 
             updated_rate.append(r)
 
@@ -67,12 +67,10 @@ class Renter:
                    "id": ids}
         db.multiple_insert("renters_group", values=[element])
         db.insert('group_people', renter_id=renter_id, group_id=ids, people_id=people_id)
-        raise web.seeother('/renter/' + str(renter_id) + "/", True)
 
         form4 = self.form4()
         if not form4.validates():
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
-
         rate_id = getNextId('rate_renter')
         HALL_ID = form4.d.drop
 
@@ -81,7 +79,7 @@ class Renter:
         stSec = int(stT[0:2]) * 3600 + int(stT[3:5]) * 60
         enSec = int(enT[0:2]) * 3600 + int(enT[3:5]) * 60
 
-        if HALL_ID != "-1":
+        if HALL_ID != "-1" and renter_id != "-1":
             element2 = {"hall_id": HALL_ID,
                         "renter_id": renter_id,
                         "start_time": stSec,

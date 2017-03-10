@@ -54,6 +54,7 @@ class Hall():
 
 
 
+
     def POST(self, hall_id):
         form = self.form()
         form2 = self.form2()
