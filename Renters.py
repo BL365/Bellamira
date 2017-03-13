@@ -27,11 +27,14 @@ class Renter:
         form2 = self.form2()
         form3 = self.form3()
         form4 = self.form4()
-        form4.drop.args = getdropValues3()
+
+        temp = getdropValues3()
+        form4.drop.args = temp
 
         rate = db.select('rate_renter', where='renter_id=$renter_id', vars=locals())
 
         updated_rate = []
+        hall = []
 
         for r in rate:
             hours = r['start_time'] / 3600
@@ -41,8 +44,10 @@ class Renter:
             hours2 = r['end_time'] / 3600
             minutes2 = r['end_time'] % 3600 / 60
             r['end_time'] = "%02d:%02d" % (hours2, minutes2)
-
-            updated_rate.append(r)
+            for t in temp:
+                if t[0] == r['hall_id']:
+                    r['hall_id'] = t[1]
+                updated_rate.append(r)
 
         return render.renter(renter, renter_man, groups, people, updated_rate, form, form2, form3, form4)
 
@@ -73,6 +78,8 @@ class Renter:
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
         rate_id = getNextId('rate_renter')
         HALL_ID = form4.d.drop
+        print HALL_ID
+
 
         stT = form4.d.startTime
         enT = form4.d.endTime
