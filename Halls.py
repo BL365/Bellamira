@@ -24,7 +24,7 @@ class Hall():
         form = self.form()
 
         updeted_zones = []
-
+        sum = 0
         for t in zones:
             hours = t['start_time'] / 3600
             minutes = t['start_time'] % 3600 / 60
@@ -33,8 +33,9 @@ class Hall():
             hours2 = t['end_time'] / 3600
             minutes2 = t['end_time'] % 3600 / 60
             t['end_time'] = "%02d:%02d" % (hours, minutes)
-
+            sum = int(t['cost']) + sum
             updeted_zones.append(t)
+        print sum, "                   HERE             "
 
         form2 = self.form2()
         temp = getdropValues2()
@@ -50,7 +51,7 @@ class Hall():
                     e['group_id'] = t[1]
                     updeted_events.append(e)
 
-        return render.prices(hall, updeted_zones, form, form2, updeted_events)
+        return render.prices(hall, updeted_zones, form, form2, updeted_events, sum)
 
 
 
