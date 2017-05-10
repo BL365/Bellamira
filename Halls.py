@@ -24,37 +24,38 @@ class Hall():
         form = self.form()
 
         updeted_zones = []
-        sum = 0
         for t in zones:
             hours = t['start_time'] / 3600
             minutes = t['start_time'] % 3600 / 60
             t['start_time'] = "%02d:%02d" % (hours, minutes)
 
-            hours2 = t['end_time'] / 3600
-            minutes2 = t['end_time'] % 3600 / 60
+            hours = t['end_time'] / 3600
+            minutes = t['end_time'] % 3600 / 60
             t['end_time'] = "%02d:%02d" % (hours, minutes)
-            sum = int(t['cost']) + sum
             updeted_zones.append(t)
-        print sum, "                   HERE             "
 
         form2 = self.form2()
         temp = getdropValues2()
         form2.drop.args = temp
-        events = db.select('using_hall', where='hall_id=$hall_id', vars=locals())
+        events = db.select('using_hall', order='start_time', where='hall_id=$hall_id', vars=locals())
         updeted_events = []
-
+        qty = 0
         for e in events:
+            qt = e['end_time'] - e['start_time']
+            qty = qty + qt
             e['start_time'] = datetime.fromtimestamp(e['start_time']).strftime("%d/%m/%Y (%a) %H:%M")
             e['end_time'] = datetime.fromtimestamp(e['end_time']).strftime("%d/%m/%Y (%a) %H:%M")
             for t in temp:
                 if t[0] == e['group_id']:
                     e['group_id'] = t[1]
                     updeted_events.append(e)
+        qt = float(qty)
+        qt = qt / 3600
+        sum = 100 * qt
+        sum = int(sum)
+
 
         return render.prices(hall, updeted_zones, form, form2, updeted_events, sum)
-
-
-
 
     def POST(self, hall_id):
         form = self.form()

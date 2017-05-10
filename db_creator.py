@@ -81,6 +81,7 @@ class dbCreator:
     createTableRateRenter = """CREATE TABLE IF NOT EXISTS rate_renter (
         id INT AUTO_INCREMENT,
         hall_id INT,
+        days_of_week TEXT,
         renter_id INT,
         start_time INT,
         end_time INT,

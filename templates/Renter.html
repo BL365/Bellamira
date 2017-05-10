@@ -20,7 +20,7 @@ $def with (renter, renter_man, groups, people, rate, form, form2, form3, form4)
                 </tr>
                 $for gr in groups:
                 <tr>
-                    <td>$gr.id</td>
+                    <td>$gr.name</td>
                     <td><a href="/renter/$renter.id/$gr.id/">$gr.name</a></td>
                 </tr>
             </table>
@@ -76,6 +76,7 @@ $def with (renter, renter_man, groups, people, rate, form, form2, form3, form4)
                 <tr>
                     <th>id</th>
                     <th>Зал</th>
+                    <th>День недели</th>
                     <th>Время Начала</th>
                     <th>Время Окончания</th>
                     <th>Стоимость</th>
@@ -84,6 +85,7 @@ $def with (renter, renter_man, groups, people, rate, form, form2, form3, form4)
                 <tr>
                     <td>$r.id</td>
                     <td>$r.hall_id</td>
+                    <td>$r.days_of_week</td>
                     <td>$r.start_time</td>
                     <td>$r.end_time</td>
                     <td>$r.cost</td>

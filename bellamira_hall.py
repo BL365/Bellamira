@@ -3,6 +3,7 @@ from Halls import Hall, Halls, DelHall
 from Check_Time import CheckTime
 from Renters import Renters, Renter
 from Group import Group, DeletePeopleFromGroup
+from Index import Index
 from Common import urls
 
 

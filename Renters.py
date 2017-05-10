@@ -13,11 +13,12 @@ class Renter:
     form3 = web.form.Form(web.form.Textbox('name'), web.form.Textbox('startDate'), web.form.Textbox('startTime'),
                           web.form.Textbox('duration'), web.form.Textbox('endDate'), web.form.Textbox('endTime'))
 
-    form4 = web.form.Form(web.form.Dropdown('drop', []), web.form.Textbox('startTime', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
+    form4 = web.form.Form(web.form.Dropdown('drop', []),  web.form.Textbox('days_of_week'),
+                          web.form.Textbox('startTime', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
                           web.form.Textbox('endTime', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"), web.form.Textbox('cost'))
 
     def GET(self, renter_id):
-        groups = db.select("renters_group", order='name', where='renter_id = $renter_id', vars=locals())
+        groups = db.select("renters_group", where='renter_id = $renter_id', vars=locals())
         people = db.query('Select * from people where id in (select people_id from group_people where renter_id = '
                                    + str(renter_id) + ')');
         renter = db.select("renters", where="id=$renter_id", vars=locals())[0]
@@ -31,23 +32,22 @@ class Renter:
         temp = getdropValues3()
         form4.drop.args = temp
 
-        rate = db.select('rate_renter', where='renter_id=$renter_id', vars=locals())
+        rate = db.select('rate_renter', vars=locals())
 
         updated_rate = []
-        hall = []
 
         for r in rate:
             hours = r['start_time'] / 3600
             minutes = r['start_time'] % 3600 / 60
             r['start_time'] = "%02d:%02d" % (hours, minutes)
 
-            hours2 = r['end_time'] / 3600
-            minutes2 = r['end_time'] % 3600 / 60
-            r['end_time'] = "%02d:%02d" % (hours2, minutes2)
+            hours = r['end_time'] / 3600
+            minutes = r['end_time'] % 3600 / 60
+            r['end_time'] = "%02d:%02d" % (hours, minutes)
             for t in temp:
                 if t[0] == r['hall_id']:
                     r['hall_id'] = t[1]
-                updated_rate.append(r)
+                    updated_rate.append(r)
 
         return render.renter(renter, renter_man, groups, people, updated_rate, form, form2, form3, form4)
 
@@ -89,6 +89,7 @@ class Renter:
         if HALL_ID != "-1" and renter_id != "-1":
             element2 = {"hall_id": HALL_ID,
                         "renter_id": renter_id,
+                        "days_of_week": form4.d.days_of_week,
                         "start_time": stSec,
                         "end_time": enSec,
                         "cost": form4.d.cost,
