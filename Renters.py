@@ -32,7 +32,7 @@ class Renter:
         temp = getdropValues3()
         form4.drop.args = temp
 
-        rate = db.select('rate_renter', vars=locals())
+        rate = db.select('rate_renter', where='renter_id=$renter_id', vars=locals())
 
         updated_rate = []
 
@@ -47,7 +47,7 @@ class Renter:
             for t in temp:
                 if t[0] == r['hall_id']:
                     r['hall_id'] = t[1]
-                    updated_rate.append(r)
+                updated_rate.append(r)
 
         return render.renter(renter, renter_man, groups, people, updated_rate, form, form2, form3, form4)
 

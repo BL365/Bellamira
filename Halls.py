@@ -53,7 +53,7 @@ class Hall():
         qt = qt / 3600
         sum = 100 * qt
         sum = int(sum)
-
+        cost = db.select()
 
         return render.prices(hall, updeted_zones, form, form2, updeted_events, sum)
 
