@@ -47,7 +47,7 @@ class Renter:
             for t in temp:
                 if t[0] == r['hall_id']:
                     r['hall_id'] = t[1]
-                updated_rate.append(r)
+                    updated_rate.append(r)
 
         return render.renter(renter, renter_man, groups, people, updated_rate, form, form2, form3, form4)
 

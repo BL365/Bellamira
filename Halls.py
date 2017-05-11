@@ -22,7 +22,6 @@ class Hall():
         hall = db.select('hall', where='id=$hall_id', vars=locals())[0]
         zones = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
         form = self.form()
-
         updeted_zones = []
         for t in zones:
             hours = t['start_time'] / 3600
@@ -39,21 +38,39 @@ class Hall():
         form2.drop.args = temp
         events = db.select('using_hall', order='start_time', where='hall_id=$hall_id', vars=locals())
         updeted_events = []
+
+        renters_renta = db.select('rate_renter', where='id=$hall_id', vars=locals())
+
         qty = 0
+        qt = float(qty)
+        qt = qt / 3600
+        sum = 100 * qt
+        sum = int(sum)
+        groups = db.select('renters_group', vars=locals())
+
+        rent_id = []
         for e in events:
-            qt = e['end_time'] - e['start_time']
-            qty = qty + qt
+            for g in groups:
+                if g['id'] == e['group_id']:
+                    a = g['renter_id']
+                    rent_id.append(a)
+        costs = []
+        for r in rent_id:
+            for renta in renters_renta:
+                if r == renta ['renter_id']:
+                    a = r['start_time'], r['end_time'], r['cost']
+                    costs.append(a)
+        zones2 = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
+
+
+
+        for e in events:
             e['start_time'] = datetime.fromtimestamp(e['start_time']).strftime("%d/%m/%Y (%a) %H:%M")
             e['end_time'] = datetime.fromtimestamp(e['end_time']).strftime("%d/%m/%Y (%a) %H:%M")
             for t in temp:
                 if t[0] == e['group_id']:
                     e['group_id'] = t[1]
                     updeted_events.append(e)
-        qt = float(qty)
-        qt = qt / 3600
-        sum = 100 * qt
-        sum = int(sum)
-        cost = db.select()
 
         return render.prices(hall, updeted_zones, form, form2, updeted_events, sum)
 
