@@ -38,29 +38,8 @@ class Hall():
         form2.drop.args = temp
         events = db.select('using_hall', order='start_time', where='hall_id=$hall_id', vars=locals())
         updeted_events = []
+        sum = 0
 
-        renters_renta = db.select('rate_renter', where='id=$hall_id', vars=locals())
-
-        qty = 0
-        qt = float(qty)
-        qt = qt / 3600
-        sum = 100 * qt
-        sum = int(sum)
-        groups = db.select('renters_group', vars=locals())
-
-        rent_id = []
-        for e in events:
-            for g in groups:
-                if g['id'] == e['group_id']:
-                    a = g['renter_id']
-                    rent_id.append(a)
-        costs = []
-        for r in rent_id:
-            for renta in renters_renta:
-                if r == renta ['renter_id']:
-                    a = r['start_time'], r['end_time'], r['cost']
-                    costs.append(a)
-        zones2 = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
 
 
 
@@ -81,22 +60,26 @@ class Hall():
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
         if not form2.validates():
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
+
         group_id = form2.d.drop
+        if form.d.startTime != None:
+            stT = form.d.startTime
+            enT = form.d.endTime
 
-        stT = form.d.startTime
-        enT = form.d.endTime
-        stSec = int(stT[0:2]) * 3600 + int(stT[3:5]) * 60
-        enSec = int(enT[0:2]) * 3600 + int(enT[3:5]) * 60
 
-        if group_id != "-1":
-            element = {"id": getNextId("time_zone"),
-                       "hall_id": hall_id,
-                       "days_of_week": form.d.days,
-                       "start_time": stSec,
-                       "end_time": enSec,
-                       "cost": form.d.cost}
-            db.multiple_insert('time_zone', values=[element])
-        raise web.seeother('/hall/' + str(hall_id) + "/", True)
+            print "here          here            here         69     |", stT, "|", enT
+            stSec = int(stT[0:2]) * 3600 + int(stT[3:5]) * 60
+            enSec = int(enT[0:2]) * 3600 + int(enT[3:5]) * 60
+
+            if group_id != "-1":
+                element = {"id": getNextId("time_zone"),
+                           "hall_id": hall_id,
+                           "days_of_week": form.d.days,
+                           "start_time": stSec,
+                           "end_time": enSec,
+                           "cost": form.d.cost}
+                db.multiple_insert('time_zone', values=[element])
+            raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
         start_dt_string2 = datetime.strptime(form2.d.start_time, "%d/%m/%Y %H:%M")
         start_dt_unix2 = time.mktime(start_dt_string2.timetuple())

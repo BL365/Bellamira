@@ -65,13 +65,15 @@ class Renter:
                        "link": form.d.link,
                        "id": people_id}
             db.multiple_insert('people', values=[element])
-        ids = getNextId('renters_group')
-        element = {"name": form.d.name,
-                   "people_id": people_id,
-                   "renter_id": renter_id,
-                   "id": ids}
-        db.multiple_insert("renters_group", values=[element])
-        db.insert('group_people', renter_id=renter_id, group_id=ids, people_id=people_id)
+            ids = getNextId('renters_group')
+            element = {"name": form.d.name,
+                       "people_id": people_id,
+                       "renter_id": renter_id,
+                       "id": ids}
+            print "            HERE 1                HERE  73           HERE           73    ", element
+            db.multiple_insert("renters_group", values=[element])
+            print "                here 2         here 75               here          75|", renter_id, "|", ids, "|", people_id
+            db.insert('group_people', renter_id=renter_id, group_id=ids, people_id=people_id)
 
         form4 = self.form4()
         if not form4.validates():
