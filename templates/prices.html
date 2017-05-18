@@ -44,7 +44,6 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
                     <th>id</th>
                     <th>мероприятие</th>
                     <th>группа</th>
-                    <th>зал</th>
                     <th>время начала</th>
                     <th>время окончания</th>
 
@@ -54,7 +53,6 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
                     <td>$e.id</td>
                     <td><a href="/using_hall/$e.id/">$e.name</a></td>
                     <td>$e.group_id</td>
-                    <td>$e.hall_id</td>
                     <td>$e.start_time</td>
                     <td>$e.end_time</td>
                 </tr>
@@ -64,6 +62,6 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
     <tr>
         <a href="/halls/">Вернуться к списку залов</a>
     </tr>
-    <h4>Суммарная стоимость аренды *** руб</h4>
+    <h4>Суммарная стоимость аренды по залу *** руб</h4>
 
 </table>

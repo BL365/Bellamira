@@ -40,7 +40,12 @@ class Hall():
         updeted_events = []
         sum = 0
 
-
+        cost_table = db.query('SELECT using_hall.[hall_id], using_hall.[group_id], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id] AS RENTER, rate_renter.[days_of_week] AS DAYS_IND_RATE, rate_renter.[start_time] AS ST_T_IND_RATE, rate_renter.[end_time] AS EN_T_IND_RATE, rate_renter.[cost] AS IND_COST, time_zone.[days_of_week] AS DAYS_ST_RATE, time_zone.[start_time] AS ST_T_ST_RATE, time_zone.[end_time] AS EN_T_ST_RATE, time_zone.[cost] AS STAND_COST FROM using_hall INNER JOIN renters_group ON using_hall.[group_id] = renters_group.[id] INNER JOIN rate_renter ON renters_group.[renter_id] = rate_renter.[renter_id] INNER JOIN time_zone ON using_hall.[hall_id] = time_zone.[hall_id]')
+        hall_cost_table = []
+        for c in cost_table:
+            if c['hall_id'] == hall_id:
+                hall_cost_table.append(c)
+        hall_cost_table
 
 
         for e in events:
@@ -62,7 +67,7 @@ class Hall():
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
         group_id = form2.d.drop
-        if form.d.startTime != None:
+        if form.d.startTime and form.d.endTime != None:
             stT = form.d.startTime
             enT = form.d.endTime
 
@@ -95,6 +100,11 @@ class Hall():
                        "end_time": end_dt_unix2}
             db.multiple_insert('using_hall', values=[element2])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
+#
+# class DelRate:
+#
+#     def GET(self, hall_id):
+#
 
 class DelHall:
 

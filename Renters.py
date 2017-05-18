@@ -1,5 +1,9 @@
 from Common import *
 
+from datetime import *
+
+import time
+
 
 class Renter:
     form = web.form.Form(
@@ -53,11 +57,23 @@ class Renter:
 
     def POST(self, renter_id):
         form = self.form()
+        form2 = self.form()
         if not form.validates():
             raise web.seeother('/renter/'+str(renter_id)+"/", True)
         if form.d.FIO == "" and form.d.name == "":
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
         people_id = form.d.drop
+
+        if form2.d.date and form2.d.sum != None:
+            dt_pays = datetime.strptime(form2.d.pays, "%d/%m/%Y %H:%M")
+            date_pays = time.mktime(dt_pays.timetuple())
+            element = {"id": getNextId("pays"),
+                       "date": date_pays,
+                       "renter_id": renter_id,
+                       "sum": form2.d.sum}
+            db.multiple_insert("pays", values=[element])
+            raise web.seeother('/renter/' + str(renter_id) + "/", True)
+
         if people_id == "-1" and form.d.FIO != "":
             people_id = getNextId('people')
             element = {"FIO": form.d.FIO,
@@ -139,3 +155,10 @@ class Renters:
         db.insert('group_people', renter_id=ids, people_id=people_id)
         raise web.seeother('/renters/', True)
 
+
+class DelRenter:
+
+    def GET(self, renter_id):
+        print "                   HEREEEEEEEEEEEEEE          |",  renter_id
+        db.delete('renters', where='id=$renter_id', vars=locals())
+        raise web.seeother('/renters/', True)
