@@ -46,6 +46,7 @@ class Hall():
             if c['hall_id'] == hall_id:
                 hall_cost_table.append(c)
         hall_cost_table
+        #zapros rabotaet, ne znau kak sdelat sopostavlenie vremeni zaniatia i tarifa, rascheta stoimosti
 
 
         for e in events:

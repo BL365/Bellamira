@@ -13,7 +13,9 @@ urls = (
     '/delhall/(\\d+)?', 'DelHall',
     '/deltimezone/(\\d+)/(\\d+)?', 'DelTimezone',
     '/prices/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d+)/', 'CheckTime'
-    '/delrenter/(\\d+)?', 'DelRenter'
+    '/delrenter/(\\d+)?', 'DelRenter', #url for new class delRenter
+    '/home/(\\d+)?', 'Home'#url for new page Home
+
 )
 
 render = web.template.render('templates', base='base')

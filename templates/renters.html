@@ -1,37 +1,52 @@
-$def with (form, renters, db)
-<table width="100%">
+﻿$def with (form, renters, db)
+<html>
+<head>
+
+
+	<link rel="stylesheet"  href="css/table.css" type="text/css"/>
+    <link rel="stylesheet" href="css/form.css" type="text/css"/>
+</head>
+<body>
+    <table width="100%">
+
     <tr>
-        <td>
-            <form action="/renters/" method="post">
+    <td>
+    <form action="/renters/" method="post">
     $:form.render()
     <input type="submit" value="Добавить">
-</form>
-        </td>
-        <td>
+    </form>
+    </td>
 
-<table border="1">
+    <td>
+
+    <table class="table" border="1">
+        <tr>
+            <th>id</th>
+            <th>Наименование</th>
+            <th>телефон</th>
+            <th>ссылка в соц.сети</th>
+        </tr>
+        $for rent in renters:
+        <tr>
+            <td>$rent.id</td>
+            $if rent.name:
+            <td><a href="/renter/$rent.id/">$rent.name</a></td>
+            <td>$rent.phone</td>
+            <td><a href="$rent.link">$rent.link</a></td>
+            <td>
+                <form action="/delrenter/$rent.id" method="get">
+                    <input type="submit" value="delete">
+                </form>
+            </td>
+        </tr>
+    </table>
+    </td>
+    </tr>
     <tr>
-        <th>id</th>
-        <th>Наименование</th>
-        <th>телефон</th>
-        <th>ссылка в соц.сети</th>
-    </tr>
-    $for rent in renters:
-    <tr>
-        <td>$rent.id</td>
-        $if rent.name:
-        <td><a href="/renter/$rent.id/">$rent.name</a></td>
-        <td>$rent.phone</td>
-        <td><a href="$rent.link">$rent.link</a></td>
-        <td>
-            <form action="/delrenter/$rent.id" method="get">
-                <input type="submit" value="delete">
-            </form>
-        </td>
-    </tr>
-</table>
-        </td>
+        <a href="/home/">На главную</a>
     </tr>
 
-</table>
+    </table>
 
+</body>
+</html>

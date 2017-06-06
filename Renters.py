@@ -14,8 +14,8 @@ class Renter:
 
     form2 = web.form.Form(web.form.Textbox("date"), web.form.Textbox('sum'))
 
-    form3 = web.form.Form(web.form.Textbox('name'), web.form.Textbox('startDate'), web.form.Textbox('startTime'),
-                          web.form.Textbox('duration'), web.form.Textbox('endDate'), web.form.Textbox('endTime'))
+    form3 = web.form.Form(web.form.Textbox('name'), web.form.Textbox('startDate'),
+                          web.form.Textbox('duration'), web.form.Textbox('endDate'))
 
     form4 = web.form.Form(web.form.Dropdown('drop', []),  web.form.Textbox('days_of_week'),
                           web.form.Textbox('startTime', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
@@ -159,6 +159,6 @@ class Renters:
 class DelRenter:
 
     def GET(self, renter_id):
-        print "                   HEREEEEEEEEEEEEEE          |",  renter_id
+        print "                   HEREEEEEEEEEEEEEE          |",  renter_id #this print does not work --> error in url?
         db.delete('renters', where='id=$renter_id', vars=locals())
         raise web.seeother('/renters/', True)
