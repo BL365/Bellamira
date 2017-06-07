@@ -1,4 +1,4 @@
-$def with (renter, renter_man, groups, people, rate, form, form2, form3, form4)
+$def with (renter, renter_man, groups, people, rate, pays, form, form2, form3, form4)
 <h3>$renter.name</h3>
 <h3>$renter_man.FIO</h3>
 <h3>$renter_man.phone <a href="$renter_man.link">$renter_man.link</a></h3>
@@ -50,7 +50,7 @@ $def with (renter, renter_man, groups, people, rate, form, form2, form3, form4)
     <tr><h3>Добавление оплаты</h3></tr>
     <tr>
         <td>
-            <form  class="form" action="/pays/$renter.id/" method="post">
+            <form class="form" action="/renter/$renter.id/" method="post">
                 $:form2.render()
                 <input type="submit" value="Добавить">
             </form>
@@ -59,15 +59,15 @@ $def with (renter, renter_man, groups, people, rate, form, form2, form3, form4)
             <h4>Лист оплат</h4>
             <table border="1">
                 <tr>
-                    <td>
-                        id
-                    </td>
-                    <td>
-                        Дата
-                    </td>
-                    <td>
-                        Сумма
-                    </td>
+                    <th>id</th>
+                    <th>Дата</th>
+                    <th>Сумма</th>
+                </tr>
+                $for p in pays:
+                <tr>
+                    <td>$p.id</td>
+                    <td>$p.date</td>
+                    <td>$p.sum</td>
                 </tr>
             </table>
         </td>
@@ -75,16 +75,9 @@ $def with (renter, renter_man, groups, people, rate, form, form2, form3, form4)
             <h4>информация о стоимости</h4>
         </td>
     </tr>
-    <tr>
-        <td>
-            <h4>задолженности</h4>
-        </td>
-        <td>
-        <h4>переплаты</h4>
-        </td>
-        <td>
-            <h4>сведения о занятиях</h4>
-        </td>
+        <tr><td><h4>задолженности</h4></td>
+        <td><h4>переплаты</h4></td>
+        <td><h4>сведения о занятиях</h4></td>
     </tr>
 </table>
 <table width="100%" border="1">

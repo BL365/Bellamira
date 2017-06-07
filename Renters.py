@@ -14,14 +14,15 @@ class Renter:
         web.form.Textbox('phone', description='Телефон'), web.form.Textbox('link', description='Ссылка в соц. сетях')
     )
 
-    form2 = web.form.Form(web.form.Textbox('date', description='Дата'), web.form.Textbox('sum', description='Сумма'))
+    form2 = web.form.Form(#web.form.Textbox('date', description='Дата'), отключено т.к. я не нашел метода для перевода в unix только даты без времени
+                          web.form.Textbox('sum', description='Сумма'))
 
     form3 = web.form.Form(web.form.Textbox('name', description='Название мероприятия'), web.form.Textbox('startDate', description='Время и дата начала'),
                           web.form.Textbox('duration', description='Продолжительность'), web.form.Textbox('endDate', description='Время и дата окончания'))
 
     form4 = web.form.Form(web.form.Dropdown('drop', [], description='Зал'),  web.form.Textbox('days_of_week', description='День недели'),
-                          web.form.Textbox('startTime', description='Время и дата начала', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
-                          web.form.Textbox('endTime', description='Время и дата окончания', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
+                          web.form.Textbox('startTime', description='Время начала', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
+                          web.form.Textbox('endTime', description='Время окончания', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
                           web.form.Textbox('cost', description='Стоимость часа'))
 
     def GET(self, renter_id):
@@ -30,6 +31,7 @@ class Renter:
                                    + str(renter_id) + ')');
         renter = db.select("renters", where="id=$renter_id", vars=locals())[0]
         renter_man = db.select("people", where="id = $renter.people_id", vars=locals())[0]
+        pays = db.select("pays", where='renter_id = $renter_id', vars=locals())
         form = self.form()
         form.drop.args = getdropValues()
         form2 = self.form2()
@@ -55,29 +57,29 @@ class Renter:
                 if t[0] == r['hall_id']:
                     r['hall_id'] = t[1]
                     updated_rate.append(r)
+        updeted_pays = []
+        for p in pays:
+            p['date'] = datetime.fromtimestamp(p['date']).strftime("%d/%m/%Y (%a) %H:%M")
+            updeted_pays.append(p)
 
-        return render.renter(renter, renter_man, groups, people, updated_rate, form, form2, form3, form4)
+        return render.renter(renter, renter_man, groups, people, updated_rate, updeted_pays, form, form2, form3, form4)
 
     def POST(self, renter_id):
         form = self.form()
         form2 = self.form()
+        form4 = self.form4()
         if not form.validates():
+            raise web.seeother('/renter/' + str(renter_id) + "/", True)
+        if not form2.validates():
             raise web.seeother('/renter/'+str(renter_id)+"/", True)
-        if form.d.FIO == "" and form.d.name == "":
+        if not form4.validates():
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
+
+
         people_id = form.d.drop
-
-        if form2.d.date and form2.d.sum != None:
-            dt_pays = datetime.strptime(form2.d.pays, "%d/%m/%Y %H:%M")
-            date_pays = time.mktime(dt_pays.timetuple())
-            element = {"id": getNextId("pays"),
-                       "date": date_pays,
-                       "renter_id": renter_id,
-                       "sum": form2.d.sum}
-            db.multiple_insert("pays", values=[element])
-            raise web.seeother('/renter/' + str(renter_id) + "/", True)
-
         if people_id == "-1" and form.d.FIO != "":
+            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM1111111 !!!!!!!!!"
+
             people_id = getNextId('people')
             element = {"FIO": form.d.FIO,
                        "phone": form.d.phone,
@@ -94,20 +96,29 @@ class Renter:
             print "                here 2         here 75               here          75|", renter_id, "|", ids, "|", people_id
             db.insert('group_people', renter_id=renter_id, group_id=ids, people_id=people_id)
 
-        form4 = self.form4()
-        if not form4.validates():
+        if renter_id == 2:
+            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM2222222 !!!!!!!!!"
+            dt_pays = datetime.now()
+            print "HERE    HERE HERE |", dt_pays
+            dt_p = time.mktime(dt_pays.timetuple())
+            print "HERE    HERE HERE |", dt_p
+            element = {"id": getNextId("pays"),
+                       "date": dt_p,
+                       "renter_id": renter_id,
+                       "sum": form2.d.sum}
+            db.multiple_insert('pays', values=[element])
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
-        rate_id = getNextId('rate_renter')
-        HALL_ID = form4.d.drop
-        print HALL_ID
 
 
-        stT = form4.d.startTime
-        enT = form4.d.endTime
-        stSec = int(stT[0:2]) * 3600 + int(stT[3:5]) * 60
-        enSec = int(enT[0:2]) * 3600 + int(enT[3:5]) * 60
+        if form4.d.drop != "-1" and renter_id != "-1" and form4.d.cost != None:
+            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM444444444 !!!!!!!!!"
+            HALL_ID = form4.d.drop
+            rate_id = getNextId('rate_renter')
 
-        if HALL_ID != "-1" and renter_id != "-1":
+            stT = form4.d.startTime
+            enT = form4.d.endTime
+            stSec = int(stT[0:2]) * 3600 + int(stT[3:5]) * 60
+            enSec = int(enT[0:2]) * 3600 + int(enT[3:5]) * 60
             element2 = {"hall_id": HALL_ID,
                         "renter_id": renter_id,
                         "days_of_week": form4.d.days_of_week,
