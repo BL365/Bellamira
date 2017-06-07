@@ -1,9 +1,10 @@
 from db_controller import *
 from Halls import Hall, Halls, DelHall
 from Check_Time import CheckTime
-from Renters import Renters, Renter
+from Renters import Renters, Renter, DelRenter
 from Group import Group, DeletePeopleFromGroup
 from Index import Index
+from Home import Home
 from Common import urls
 
 
@@ -21,4 +22,5 @@ app = web.application(urls, globals())
 if __name__ == '__main__':
     print "http://localhost:8080/renters/"
     print "http://localhost:8080/halls/"
+    print "http://localhost:8080/home/"
     app.run()

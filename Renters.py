@@ -1,3 +1,5 @@
+# coding: utf8
+
 from Common import *
 
 from datetime import *
@@ -7,19 +9,20 @@ import time
 
 class Renter:
     form = web.form.Form(
-        web.form.Textbox('name'), web.form.Dropdown('drop', []),
-        web.form.Checkbox('other'), web.form.Textbox('FIO'),
-        web.form.Textbox('phone'), web.form.Textbox('link')
+        web.form.Textbox('name', description='Название группы'), web.form.Dropdown('drop', [], description='Руководитель'),
+        web.form.Checkbox('other', description='Новый?'), web.form.Textbox('FIO', description='ФИО нового руководителя'),
+        web.form.Textbox('phone', description='Телефон'), web.form.Textbox('link', description='Ссылка в соц. сетях')
     )
 
-    form2 = web.form.Form(web.form.Textbox("date"), web.form.Textbox('sum'))
+    form2 = web.form.Form(web.form.Textbox('date', description='Дата'), web.form.Textbox('sum', description='Сумма'))
 
-    form3 = web.form.Form(web.form.Textbox('name'), web.form.Textbox('startDate'),
-                          web.form.Textbox('duration'), web.form.Textbox('endDate'))
+    form3 = web.form.Form(web.form.Textbox('name', description='Название мероприятия'), web.form.Textbox('startDate', description='Время и дата начала'),
+                          web.form.Textbox('duration', description='Продолжительность'), web.form.Textbox('endDate', description='Время и дата окончания'))
 
-    form4 = web.form.Form(web.form.Dropdown('drop', []),  web.form.Textbox('days_of_week'),
-                          web.form.Textbox('startTime', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
-                          web.form.Textbox('endTime', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"), web.form.Textbox('cost'))
+    form4 = web.form.Form(web.form.Dropdown('drop', [], description='Зал'),  web.form.Textbox('days_of_week', description='День недели'),
+                          web.form.Textbox('startTime', description='Время и дата начала', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
+                          web.form.Textbox('endTime', description='Время и дата окончания', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
+                          web.form.Textbox('cost', description='Стоимость часа'))
 
     def GET(self, renter_id):
         groups = db.select("renters_group", where='renter_id = $renter_id', vars=locals())
@@ -119,10 +122,10 @@ class Renter:
 class Renters:
 
     form = web.form.Form(
-        web.form.Textbox('name'), web.form.Textbox('renter_link'),
-        web.form.Textbox('renter_phone'), web.form.Dropdown('drop', [(-1, "Add")]),
-        web.form.Checkbox('other'), web.form.Textbox('FIO'),
-        web.form.Textbox('phone'), web.form.Textbox('link')
+        web.form.Textbox('name', description='Название организации'), web.form.Textbox('renter_link', description='Ссылка'),
+        web.form.Textbox('renter_phone', description='Телефон'), web.form.Dropdown('drop', [(-1, "Add")], description='Выберите руководителя'),
+        web.form.Checkbox('other', description='Новый руководитель'), web.form.Textbox('FIO', description='ФИО руководителя'),
+        web.form.Textbox('phone', description='Телефон'), web.form.Textbox('link', description='Ссылка в соц. сетях')
     )
 
     def GET(self):

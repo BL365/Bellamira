@@ -1,4 +1,13 @@
+# encoding=utf8
+import sys
+
+# coding: utf8
+
 from db_controller import *
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 
 urls = (
     '/', 'Index',
@@ -12,7 +21,7 @@ urls = (
     '/rentTimezone/', 'RentTimezone',
     '/delhall/(\\d+)?', 'DelHall',
     '/deltimezone/(\\d+)/(\\d+)?', 'DelTimezone',
-    '/prices/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d+)/', 'CheckTime'
+    '/prices/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2})/(\\d+)/', 'CheckTime',
     '/delrenter/(\\d+)?', 'DelRenter', #url for new class delRenter
     '/home/(\\d+)?', 'Home'#url for new page Home
 

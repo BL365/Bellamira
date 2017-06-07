@@ -1,3 +1,5 @@
+# coding: utf8
+
 from Common import *
 
 class DeletePeopleFromGroup:
@@ -9,8 +11,9 @@ class DeletePeopleFromGroup:
 
 class Group:
 
-    form = web.form.Form(web.form.Dropdown('drop', []), web.form.Textbox('FIO'), web.form.Textbox('phone'),
-                         web.form.Textbox('link')
+    form = web.form.Form(web.form.Dropdown('drop', [], description='Руководитель'), web.form.Textbox('FIO', description='ФИО нового руководителя'),
+                         web.form.Textbox('phone', description='Телефон'),
+                         web.form.Textbox('link', description='Ссылка в соц. сетях')
                          )
 
     def GET(self, renter_id, group_id):

@@ -1,52 +1,47 @@
 ﻿$def with (form, renters, db)
-<html>
-<head>
 
-
-	<link rel="stylesheet"  href="static/table.css" type="text/css"/>
-    <link rel="stylesheet" href="static/form.css" type="text/css"/>
-</head>
-<body>
-    <table width="100%">
-
+<table width="100%" border = "1">
+    <tr><h2>Организаторы-арендаторы</h2></tr>
+</table>
+<table width="100%" border = "1">
     <tr>
-    <td>
-    <form action="/renters/" method="post">
-    $:form.render()
-    <input type="submit" value="Добавить">
-    </form>
-    </td>
+        <td>
+            <form  class="form" action="/renters/" method="post">
+                $:form.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <td width="20%"></td>
 
-    <td>
-
-    <table class="table" border="1">
-        <tr>
-            <th>id</th>
-            <th>Наименование</th>
-            <th>телефон</th>
-            <th>ссылка в соц.сети</th>
-        </tr>
-        $for rent in renters:
-        <tr>
-            <td>$rent.id</td>
-            $if rent.name:
-            <td><a href="/renter/$rent.id/">$rent.name</a></td>
-            <td>$rent.phone</td>
-            <td><a href="$rent.link">$rent.link</a></td>
-            <td>
-                <form action="/delrenter/$rent.id" method="get">
-                    <input type="submit" value="delete">
-                </form>
-            </td>
-        </tr>
-    </table>
-    </td>
+        <td>
+            <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>Наименование</th>
+                    <th>телефон</th>
+                    <th>ссылка в соц.сети</th>
+                </tr>
+                $for rent in renters:
+                <tr>
+                    <td>$rent.id</td>
+                    $if rent.name:
+                    <td><a href="/renter/$rent.id/">$rent.name</a></td>
+                    <td>$rent.phone</td>
+                    <td><a href="$rent.link">$rent.link</a></td>
+                    <td width="120">
+                        <form action="/delrenter/$rent.id" method="get">
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
     </tr>
+</table>
+<table width="100%">
+    <br><br><br>
     <tr>
         <a href="/home/">На главную</a>
     </tr>
 
-    </table>
-
-</body>
-</html>
+</table>

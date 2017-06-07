@@ -1,47 +1,16 @@
-<!--$def with (form)-->
-<!--эта страица не открывается по ссылке с других страниц, полагаю я косячу в url-->
-<!--<h1>Здарова</h1>-->
-<!--<a href="/renters/">К списку арендаторов</a>-->
-<!--<a href="/halls/">К списку залов</a>-->
-<!--<meta charset="utf-8">-->
-<!--<script src="//ulogin.ru/js/ulogin.js"></script>-->
-<!--<div id="uLogin" data-ulogin="display=small;theme=classic;fields=first_name,last_name;providers=google,googleplus;hidden=;redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Frenter%2F1%2F;mobilebuttons=0;"></div>-->
+$def with (form)
+<h1>Здарова</h1>
+<a href="/renters/">К списку арендаторов</a>
+<a href="/halls/">К списку залов</a>
 
+<table width="100%" border="1">
+    <tr>
+        <td>
+        <form action="/home/" method="post">
+            $:form.render()
+        <input type="submit" value="Добавить">
+        </form>
+        </td>
 
-  <!--<meta http-equiv="Content-Type" content="text/html; charset=utf-8">-->
-  <!--<title>Стили</title>-->
-  <!--<link rel="stylesheet" type="text/css" href="a1.css">-->
-
-   <!--<style>-->
-   <!--body {-->
-    <!--background-image: url(images/as.jpg);-->
-    <!--background-size: 100%;-->
-    <!--background-color: #ffffff; /* Цвет фона */-->
-   <!--}-->
-  <!--</style>-->
-
-
-<!--<table width="100%" border="20">-->
- <!--<tr>-->
-  <!--<td>-->
-
-
-
-  <!--</td>-->
-  <!--<td>-->
-
-
-
-  <!--</td>-->
- <!--</tr>-->
- <!--<tr>-->
-<!--<td>-->
-
-<!--</td>-->
- <!--</tr>-->
-
-
-
-
-<!--</table>-->
-
+    </tr>
+</table>

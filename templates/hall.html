@@ -1,12 +1,14 @@
 $def with (halls, form)
+<h2>Залы</h2>
 <table width="100%">
     <tr>
-        <td>
-            <form action="/halls/" method="post">
+        <td width="30%">
+            <form  class="form" action="/halls/" method="post">
                 $:form.render()
                 <input type="submit" value="Добавить">
             </form>
         </td>
+        <td width="45%"></td>
         <td>
             <table border="1">
                 <tr>
@@ -21,7 +23,7 @@ $def with (halls, form)
                     <td>$h.square</td>
                     <td>
                         <form action="/delhall/$h.id" method="get">
-                            <input type="submit" value="delete">
+                            <input type="submit" value="Удалить">
                         </form>
                     </td>
                 </tr>
@@ -29,3 +31,7 @@ $def with (halls, form)
         </td>
     </tr>
 </table>
+<table width="100%">
+    <br><br><br><br>
+<a href="/home/">На главную</a>
+    </table>
