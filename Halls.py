@@ -103,11 +103,6 @@ class Hall():
                        "end_time": end_dt_unix2}
             db.multiple_insert('using_hall', values=[element2])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
-#
-# class DelRate:
-#
-#     def GET(self, hall_id):
-#
 
 class DelHall:
 

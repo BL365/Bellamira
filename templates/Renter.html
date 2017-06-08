@@ -1,4 +1,4 @@
-$def with (renter, renter_man, groups, people, rate, pays, form, form2, form3, form4)
+$def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form2, form3, form4)
 <h3>$renter.name</h3>
 <h3>$renter_man.FIO</h3>
 <h3>$renter_man.phone <a href="$renter_man.link">$renter_man.link</a></h3>
@@ -71,13 +71,9 @@ $def with (renter, renter_man, groups, people, rate, pays, form, form2, form3, f
                 </tr>
             </table>
         </td>
-        <td>
-            <h4>информация о стоимости</h4>
-        </td>
-    </tr>
-        <tr><td><h4>задолженности</h4></td>
+        <td><h4>задолженности</h4></td>
         <td><h4>переплаты</h4></td>
-        <td><h4>сведения о занятиях</h4></td>
+
     </tr>
 </table>
 <table width="100%" border="1">
@@ -88,6 +84,24 @@ $def with (renter, renter_man, groups, people, rate, pays, form, form2, form3, f
                 $:form3.render()
                 <input type="submit" value="Добавить">
             </form>
+        </td>
+        <td><h4>Cведения о занятиях</h4>
+            <table border="1">
+                <th>Группа</th>
+                <th>Название занятия</th>
+                <th>Зал</th>
+                <th>Время начала</th>
+                <th>Время окончания</th>
+                $for e in ev_groups
+                <td>$e.group_name</td>
+                <td>$e.name</td>
+                <td>$e.hall_name</td>
+                <td>$e.start_time</td>
+                <td>$e.end_time</td>
+
+
+            </table>
+
         </td>
     </tr>
 </table>
@@ -125,4 +139,5 @@ $def with (renter, renter_man, groups, people, rate, pays, form, form2, form3, f
 </table>
 
 <a href="/renters/">перейти к списку арендаторов</a>
+<a href="/halls/">перейти к списку залов</a>
 <!--здесь были некоторые попытки внедрить дизайн, в итоге ограничился некоторыми добавлениями кусков интерфейса-->

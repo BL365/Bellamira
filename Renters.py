@@ -32,6 +32,8 @@ class Renter:
         renter = db.select("renters", where="id=$renter_id", vars=locals())[0]
         renter_man = db.select("people", where="id = $renter.people_id", vars=locals())[0]
         pays = db.select("pays", where='renter_id = $renter_id', vars=locals())
+        rate = db.select('rate_renter', where='renter_id=$renter_id', vars=locals())
+        events_groups = db.query('SELECT using_hall.[name], using_hall.[hall_id], using_hall.[group_id], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id] AS renter, renters_group.[name] AS group_name, hall.[name] AS hall_name FROM renters_group INNER JOIN using_hall ON renters_group.[id] = using_hall.[group_id] INNER JOIN hall ON using_hall.[hall_id] = hall.[id]')
         form = self.form()
         form.drop.args = getdropValues()
         form2 = self.form2()
@@ -41,7 +43,17 @@ class Renter:
         temp = getdropValues3()
         form4.drop.args = temp
 
-        rate = db.select('rate_renter', where='renter_id=$renter_id', vars=locals())
+        uppd_ev_groups = []
+        for e in events_groups:
+            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEE ИТератор в цикле"
+            e['start_time'] = datetime.fromtimestamp(e['start_time']).strftime("%d/%m/%Y (%a) %H:%M")
+            e['end_time'] = datetime.fromtimestamp(e['end_time']).strftime("%d/%m/%Y (%a) %H:%M")
+            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEE   сравнение.", e['renter'], "|", renter_id
+            if e['renter'] == renter_id:
+                uppd_ev_groups.append(e)
+                print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEE ИТератор в добавил v uppd!!"
+        print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEE ИТератор прошел цикл|", uppd_ev_groups
+
 
         updated_rate = []
 
@@ -58,13 +70,15 @@ class Renter:
                     r['hall_id'] = t[1]
                     updated_rate.append(r)
         updeted_pays = []
+        print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEE ИТератор перед pays|"
         for p in pays:
             p['date'] = datetime.fromtimestamp(p['date']).strftime("%d/%m/%Y (%a) %H:%M")
             updeted_pays.append(p)
-
-        return render.renter(renter, renter_man, groups, people, updated_rate, updeted_pays, form, form2, form3, form4)
+        print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEE ИТератор перед return|"
+        return render.renter(renter, renter_man, groups, people, updated_rate, updeted_pays, uppd_ev_groups, form, form2, form3, form4)
 
     def POST(self, renter_id):
+        print "ИТЕРАТОР В КЛАССЕ РЕНТЕР _ ПОСТ"
         form = self.form()
         form2 = self.form()
         form4 = self.form4()
@@ -77,7 +91,7 @@ class Renter:
 
 
         people_id = form.d.drop
-        if people_id == "-1" and form.d.FIO != "":
+        if people_id == "-1" or form.d.FIO != "":
             print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM1111111 !!!!!!!!!"
 
             people_id = getNextId('people')
@@ -95,9 +109,9 @@ class Renter:
             db.multiple_insert("renters_group", values=[element])
             print "                here 2         here 75               here          75|", renter_id, "|", ids, "|", people_id
             db.insert('group_people', renter_id=renter_id, group_id=ids, people_id=people_id)
-
-        if renter_id == 2:
-            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM2222222 !!!!!!!!!"
+        #Этот метод не знает о существовании form2, почему?
+        if renter_id == 2:# это условие многократно менялось
+            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM2222222 !!!!!!!!!"# не было видно ни разу в ее жизни!!
             dt_pays = datetime.now()
             print "HERE    HERE HERE |", dt_pays
             dt_p = time.mktime(dt_pays.timetuple())

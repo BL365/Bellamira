@@ -2,18 +2,51 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
 <script type="text/javascript" src="/static/jquery.js"></script>
 <script type="text/javascript" src="/static/prices_script.js"></script>
 <h2>$hall.name</h2>
+
+<table width="100%">
+    <h3>Добавление мероприятия</h3>
+    <tr>
+        <td>
+            <form class="form" action="/hall/$hall.id/" method="post" onsubmit="return A($hall.id);" id="form0">
+                $:form2.render()
+                <input type="submit" value="Добавить">
+            </form>
+        </td>
+        <td width="10%"></td>
+        <td>
+            <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>мероприятие</th>
+                    <th>группа</th>
+                    <th>время начала</th>
+                    <th>время окончания</th>
+
+                </tr>
+                $for e in updeted_events
+                <tr>
+                    <td>$e.id</td>
+                    <td>$e.name</td>
+                    <td>$e.group_id</td>
+                    <td>$e.start_time</td>
+                    <td>$e.end_time</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 <table width="100%">
     <tr>
     <h3>Добавление тарифа</h3>
     </tr>
     <tr>
         <td>
-            <form  class="form" action="/hall/$hall.id/" method="post">
+            <form class="form" action="/hall/$hall.id/" method="post">
                 $:form.render()
                 <input type="submit" value="Добавить">
             </form>
         </td>
-
+        <td width="15%"></td>
         <td>
             <table border="1">
                 <tr>
@@ -36,40 +69,10 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
     </tr>
 </table>
 <table width="100%">
-    <h3>Добавление мероприятия</h3>
-    <tr>
-        <td>
-            <form class="form" action="/hall/$hall.id/" method="post" onsubmit="return A($hall.id);" id="form0">
-                $:form2.render()
-                <input type="submit" value="Добавить">
-            </form>
-        </td>
-        <td>
-            <table border="1">
-                <tr>
-                    <th>id</th>
-                    <th>мероприятие</th>
-                    <th>группа</th>
-                    <th>время начала</th>
-                    <th>время окончания</th>
-
-                </tr>
-                $for e in updeted_events
-                <tr>
-                    <td>$e.id</td>
-                    <td><a href="/using_hall/$e.id/">$e.name</a></td>
-                    <td>$e.group_id</td>
-                    <td>$e.start_time</td>
-                    <td>$e.end_time</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
-<table width="100%">
 
     <tr>
-        <a href="/halls/">Вернуться к списку залов</a>
+        <a href="/halls/">Вернуться к списку залов</a> <br>
+        <a href="/renters/">перейти к списку арендаторов</a>
     </tr>
     <tr>
     <h4>Суммарная стоимость аренды по залу *** руб</h4>
