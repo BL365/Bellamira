@@ -14,22 +14,28 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
         </td>
         <td width="10%"></td>
         <td>
-            <table border="1">
+            <table border="0" bordercolor="000000" cellspacing="2">
                 <tr>
-                    <th>id</th>
-                    <th>мероприятие</th>
-                    <th>группа</th>
-                    <th>время начала</th>
-                    <th>время окончания</th>
+                    <th bgcolor="03a2d3">id</th>
+                    <th bgcolor="03a2d3">мероприятие</th>
+                    <th bgcolor="03a2d3">группа</th>
+                    <th bgcolor="03a2d3">время начала</th>
+                    <th bgcolor="03a2d3">время окончания</th>
+                    <th bgcolor="03a2d3">Удаление</th>
 
                 </tr>
                 $for e in updeted_events
                 <tr>
-                    <td>$e.id</td>
-                    <td>$e.name</td>
-                    <td>$e.group_id</td>
-                    <td>$e.start_time</td>
-                    <td>$e.end_time</td>
+                    <td bgcolor="03a2d3" bordercolor="000000">$e.id</td>
+                    <td bgcolor="afcde7">$e.name</td>
+                    <td bgcolor="afcde7">$e.group_id</td>
+                    <td bgcolor="afcde7">$e.start_time</td>
+                    <td bgcolor="afcde7">$e.end_time</td>
+                    <td bgcolor="afcde7">
+                        <form>
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
                 </tr>
             </table>
         </td>
@@ -48,21 +54,27 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
         </td>
         <td width="15%"></td>
         <td>
-            <table border="1">
+            <table border="0" bordercolor="000000" cellspacing="2">
                 <tr>
-                    <th>id</th>
-                    <th>день недели</th>
-                    <th>время начала</th>
-                    <th>время окончания</th>
-                    <th>общая стоимость</th>
+                    <th bgcolor="03a2d3">id</th>
+                    <th bgcolor="03a2d3">день недели</th>
+                    <th bgcolor="03a2d3">время начала</th>
+                    <th bgcolor="03a2d3">время окончания</th>
+                    <th bgcolor="03a2d3">общая стоимость</th>
+                    <th bgcolor="03a2d3">Удаление</th>
                 </tr>
                 $for z in time_zones:
                 <tr>
-                    <td><a href="/timezone/$z.id/"></a>$z.id</td>
-                    <td>$z.days_of_week</td>
-                    <td>$z.start_time</td>
-                    <td>$z.end_time</td>
-                    <td>$z.cost</td>
+                    <td bgcolor="03a2d3"><a href="/timezone/$z.id/"></a>$z.id</td>
+                    <td bgcolor="afcde7">$z.days_of_week</td>
+                    <td bgcolor="afcde7">$z.start_time</td>
+                    <td bgcolor="afcde7">$z.end_time</td>
+                    <td bgcolor="afcde7">$z.cost</td>
+                    <td bgcolor="afcde7">
+                        <form>
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
                 </tr>
             </table>
         </td>

@@ -1,5 +1,6 @@
 $def with (halls, form)
 <h2>Залы</h2>
+<br>
 <table width="100%">
     <tr>
         <td width="30%">
@@ -10,18 +11,19 @@ $def with (halls, form)
         </td>
         <td width="45%"></td>
         <td>
-            <table border="1">
+            <table border="0" bordercolor="000000" cellspacing="2">
                 <tr>
-                    <th>id</th>
-                    <th>Наименование</th>
-                    <th>Площадь</th>
+                    <th bgcolor="03a2d3">id</th>
+                    <th bgcolor="03a2d3">Наименование</th>
+                    <th bgcolor="03a2d3">Площадь</th>
+                    <th bgcolor="03a2d3">Удаление</th>
                 </tr>
                 $for h in halls:
                 <tr>
-                    <td>$h.id</td>
-                    <td><a href="/hall/$h.id/">$h.name</a></td>
-                    <td>$h.square</td>
-                    <td>
+                    <td bgcolor="03a2d3">$h.id</td>
+                    <td bgcolor="afcde7"><a href="/hall/$h.id/">$h.name</a></td>
+                    <td bgcolor="afcde7">$h.square</td>
+                    <td bgcolor="afcde7">
                         <form action="/delhall/$h.id" method="get">
                             <input type="submit" value="Удалить">
                         </form>

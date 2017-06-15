@@ -3,7 +3,7 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
 <h3>$renter_man.FIO</h3>
 <h3>$renter_man.phone <a href="$renter_man.link">$renter_man.link</a></h3>
 
-<table width="100%" border="1">
+<table width="100%">
     <tr><h3>Добавление группы</h3></tr>
     <tr>
         <td>
@@ -13,40 +13,52 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
             </form>
         </td>
         <td>
-            <table border="1">
+            <table border="0" bordercolor="000000" cellspacing="2">
                 <h4>Группы</h4>
                 <tr>
-                    <th>id</th>
-                    <th>Наименование</th>
+                    <th bgcolor="03a2d3">id</th>
+                    <th bgcolor="03a2d3">Наименование</th>
+                    <th bgcolor="03a2d3">Удаление</th>
                 </tr>
                 $for gr in groups:
                 <tr>
-                    <td>$gr.id</td>
-                    <td><a href="/renter/$renter.id/$gr.id/">$gr.name</a></td>
+                    <td bgcolor="03a2d3">$gr.id</td>
+                    <td bgcolor="afcde7"><a href="/renter/$renter.id/$gr.id/">$gr.name</a></td>
+                    <td bgcolor="afcde7">
+                        <form>
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
                 </tr>
             </table>
         </td>
         <td>
-            <table border="1">
+            <table border="0" bordercolor="000000" cellspacing="2">
                 <h4>Преподаватели</h4>
                 <tr>
-                    <th>id</th>
-                    <th>ФИО</th>
-                    <th>телефон</th>
-                    <th>ссылка в соц.сети</th>
+                    <th bgcolor="03a2d3">id</th>
+                    <th bgcolor="03a2d3">ФИО</th>
+                    <th bgcolor="03a2d3">телефон</th>
+                    <th bgcolor="03a2d3">ссылка в соц.сети</th>
+                    <th bgcolor="03a2d3">Удаление</th>
                 </tr>
                 $for p in people:
                 <tr>
-                    <td>$p.id</td>
-                    <td>$p.FIO</td>
-                    <td>$p.phone</td>
-                    <td><a href="$p.link">$p.link</a></td>
+                    <td bgcolor="03a2d3">$p.id</td>
+                    <td bgcolor="afcde7">$p.FIO</td>
+                    <td bgcolor="afcde7">$p.phone</td>
+                    <td bgcolor="afcde7"><a href="$p.link">$p.link</a></td>
+                    <td bgcolor="afcde7">
+                        <form>
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
                 </tr>
             </table>
         </td>
     </tr>
 </table>
-<table width="100%" border="1">
+<table width="100%">
     <tr><h3>Добавление оплаты</h3></tr>
     <tr>
         <td>
@@ -57,27 +69,73 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
         </td>
         <td>
             <h4>Лист оплат</h4>
-            <table border="1">
+            <table border="0" bordercolor="000000" cellspacing="2">
                 <tr>
-                    <th>id</th>
-                    <th>Дата</th>
-                    <th>Сумма</th>
+                    <th bgcolor="03a2d3">id</th>
+                    <th bgcolor="03a2d3">Дата</th>
+                    <th bgcolor="03a2d3">Сумма</th>
+                    <th bgcolor="03a2d3">Удаление</th>
                 </tr>
                 $for p in pays:
                 <tr>
-                    <td>$p.id</td>
-                    <td>$p.date</td>
-                    <td>$p.sum</td>
+                    <td bgcolor="03a2d3">$p.id</td>
+                    <td bgcolor="afcde7">$p.date</td>
+                    <td bgcolor="afcde7">$p.sum</td>
+                    <td bgcolor="afcde7">
+                        <form>
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
                 </tr>
             </table>
         </td>
-        <td><h4>задолженности</h4></td>
-        <td><h4>переплаты</h4></td>
+        <td>
+            <table border="0" bordercolor="000000" cellspacing="2">
+                    <h4>Задолженности</h4>
+                    <tr>
+                        <th bgcolor="03a2d3">id</th>
+                        <th bgcolor="03a2d3">Сумма</th>
+                        <th bgcolor="03a2d3">Удаление</th>
+                    </tr>
+                    $for p in people:
+                    <tr>
+                        <td bgcolor="03a2d3">$p.id</td>
+                        <td bgcolor="afcde7">$p.FIO</td>
+
+                        <td bgcolor="afcde7">
+                            <form>
+                                <input type="submit" value="Удалить">
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+        </td>
+        <td>
+            <table border="0" bordercolor="000000" cellspacing="2">
+                    <h4>переплаты</h4>
+                    <tr>
+                        <th bgcolor="03a2d3">id</th>
+                        <th bgcolor="03a2d3">Сумма</th>
+                        <th bgcolor="03a2d3">Удаление</th>
+                    </tr>
+                    $for p in people:
+                    <tr>
+                        <td bgcolor="03a2d3">$p.id</td>
+                        <td bgcolor="afcde7">$p.FIO</td>
+
+                        <td bgcolor="afcde7">
+                            <form>
+                                <input type="submit" value="Удалить">
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+        </td>
 
     </tr>
 </table>
-<table width="100%" border="1">
-    <tr><h3>Баллы?</h3></tr>
+<table width="100%">
+    <tr><h3>Добавление занятия</h3></tr>
     <tr>
         <td>
             <form class="form"  action="/using/$renter.id/" method="post">
@@ -86,18 +144,24 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
             </form>
         </td>
         <td><h4>Cведения о занятиях</h4>
-            <table border="1">
-                <th>Группа</th>
-                <th>Название занятия</th>
-                <th>Зал</th>
-                <th>Время начала</th>
-                <th>Время окончания</th>
+            <table border="0" bordercolor="000000" cellspacing="2">
+                <th bgcolor="03a2d3">Группа</th>
+                <th bgcolor="03a2d3">Название занятия</th>
+                <th bgcolor="03a2d3">Зал</th>
+                <th bgcolor="03a2d3">Время начала</th>
+                <th bgcolor="03a2d3">Время окончания</th>
+                <th bgcolor="03a2d3">Удаление</th>
                 $for e in ev_groups
-                <td>$e.group_name</td>
-                <td>$e.name</td>
-                <td>$e.hall_name</td>
-                <td>$e.start_time</td>
-                <td>$e.end_time</td>
+                <td bgcolor="afcde7">$e.group_name</td>
+                <td bgcolor="afcde7">$e.name</td>
+                <td bgcolor="afcde7">$e.hall_name</td>
+                <td bgcolor="afcde7">$e.start_time</td>
+                <td bgcolor="afcde7">$e.end_time</td>
+                <td bgcolor="afcde7">
+                        <form>
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
 
 
             </table>
@@ -105,7 +169,7 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
         </td>
     </tr>
 </table>
-<table width="100%" border="1">
+<table width="100%">
     <tr><h3>Добавление индивидуального тарифа</h3></tr>
     <tr>
         <td>
@@ -115,23 +179,29 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
             </form>
         </td>
         <td>
-            <table border="1">
+            <table border="0" bordercolor="000000" cellspacing="2">
                 <tr>
-                    <th>id</th>
-                    <th>Зал</th>
-                    <th>День недели</th>
-                    <th>Время Начала</th>
-                    <th>Время Окончания</th>
-                    <th>Стоимость</th>
+                    <th bgcolor="03a2d3">id</th>
+                    <th bgcolor="03a2d3">Зал</th>
+                    <th bgcolor="03a2d3">День недели</th>
+                    <th bgcolor="03a2d3">Время Начала</th>
+                    <th bgcolor="03a2d3">Время Окончания</th>
+                    <th bgcolor="03a2d3">Стоимость</th>
+                    <th bgcolor="03a2d3">Удаление</th>
                 </tr>
                 $for r in rate:
                 <tr>
-                    <td>$r.id</td>
-                    <td>$r.hall_id</td>
-                    <td>$r.days_of_week</td>
-                    <td>$r.start_time</td>
-                    <td>$r.end_time</td>
-                    <td>$r.cost</td>
+                    <td bgcolor="03a2d3">$r.id</td>
+                    <td bgcolor="afcde7">$r.hall_id</td>
+                    <td bgcolor="afcde7">$r.days_of_week</td>
+                    <td bgcolor="afcde7">$r.start_time</td>
+                    <td bgcolor="afcde7">$r.end_time</td>
+                    <td bgcolor="afcde7">$r.cost</td>
+                    <td bgcolor="afcde7">
+                        <form>
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
                 </tr>
             </table>
         </td>

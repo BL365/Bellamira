@@ -13,20 +13,21 @@ $def with (renter, renter_man, group, people, form)
             </form>
         </td>
         <td>
-            <table border="1">
+            <table border="0" bordercolor="000000" cellspacing="2">
                 <tr>
-                    <th>id</th>
-                    <th>ФИО</th>
-                    <th>телефон</th>
-                    <th>ссылка в соц.сети</th>
+                    <th bgcolor="03a2d3">id</th>
+                    <th bgcolor="03a2d3">ФИО</th>
+                    <th bgcolor="03a2d3">телефон</th>
+                    <th bgcolor="03a2d3">ссылка в соц.сети</th>
+                    <th bgcolor="03a2d3">Удаление</th>
                 </tr>
                 $for p in people:
                 <tr>
-                    <td>$p.id</td>
-                    <td>$p.FIO</td>
-                    <td>$p.phone</td>
-                    <td><a href="$p.link">$p.link</a></td>
-                    <td>
+                    <td bgcolor="03a2d3">$p.id</td>
+                    <td bgcolor="afcde7">$p.FIO</td>
+                    <td bgcolor="afcde7">$p.phone</td>
+                    <td bgcolor="afcde7"><a href="$p.link">$p.link</a></td>
+                    <td bgcolor="afcde7">
                         <form action="/deletePeopleFromGroup/$renter.id/$group.id/$p.id" method="get">
                             <input type="submit" value="Удалить">
                         </form>

@@ -69,17 +69,14 @@ class Hall():
         if not form2.validates():
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
-        group_id = form2.d.drop
         if form.d.startTime and form.d.endTime != None:
             stT = form.d.startTime
             enT = form.d.endTime
-
-
             print "here          here            here         69     |", stT, "|", enT
             stSec = int(stT[0:2]) * 3600 + int(stT[3:5]) * 60
             enSec = int(enT[0:2]) * 3600 + int(enT[3:5]) * 60
 
-            if group_id != "-1":
+            if form.d.drop != "-1":
                 element = {"id": getNextId("time_zone"),
                            "hall_id": hall_id,
                            "days_of_week": form.d.days,
@@ -89,19 +86,19 @@ class Hall():
                 db.multiple_insert('time_zone', values=[element])
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
-        start_dt_string2 = datetime.strptime(form2.d.start_time, "%d/%m/%Y %H:%M")
-        start_dt_unix2 = time.mktime(start_dt_string2.timetuple())
-        end_dt_string2 = datetime.strptime(form2.d.end_time, "%d/%m/%Y %H:%M")
-        end_dt_unix2 = time.mktime(end_dt_string2.timetuple())
-
-        if group_id != "-1":
-            element2 = {"id": getNextId("using_hall"),
-                       "name": form2.d.name,
-                       "group_id": group_id,
-                       "hall_id": hall_id,
-                       "start_time": start_dt_unix2,
-                       "end_time": end_dt_unix2}
-            db.multiple_insert('using_hall', values=[element2])
+        if form2.d.startTime and form2.d.endTime != None:
+            if form2.d.drop != "-1":
+                start_dt_string2 = datetime.strptime(form2.d.start_time, "%d/%m/%Y %H:%M")
+                start_dt_unix2 = time.mktime(start_dt_string2.timetuple())
+                end_dt_string2 = datetime.strptime(form2.d.end_time, "%d/%m/%Y %H:%M")
+                end_dt_unix2 = time.mktime(end_dt_string2.timetuple())
+                element2 = {"id": getNextId("using_hall"),
+                           "name": form2.d.name,
+                           "group_id": form2.d.drop,
+                           "hall_id": hall_id,
+                           "start_time": start_dt_unix2,
+                           "end_time": end_dt_unix2}
+                db.multiple_insert('using_hall', values=[element2])
         raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
 class DelHall:

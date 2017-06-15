@@ -14,11 +14,12 @@ class Renter:
         web.form.Textbox('phone', description='Телефон'), web.form.Textbox('link', description='Ссылка в соц. сетях')
     )
 
-    form2 = web.form.Form(#web.form.Textbox('date', description='Дата'), отключено т.к. я не нашел метода для перевода в unix только даты без времени
+    form2 = web.form.Form(web.form.Textbox('date', description='Дата'),
                           web.form.Textbox('sum', description='Сумма'))
 
-    form3 = web.form.Form(web.form.Textbox('name', description='Название мероприятия'), web.form.Textbox('startDate', description='Время и дата начала'),
-                          web.form.Textbox('duration', description='Продолжительность'), web.form.Textbox('endDate', description='Время и дата окончания'))
+    form3 = web.form.Form(web.form.Textbox('name', description='Название'), web.form.Dropdown('drop', [], description='Группа'),
+        web.form.Textbox('start_time', pattern="\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2}", size="16", maxlength="16", id="st_t", description='Время начала'),
+        web.form.Textbox('end_time', pattern="\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2}", size="16", maxlength="16", id="end_t", description='Время окончания'))
 
     form4 = web.form.Form(web.form.Dropdown('drop', [], description='Зал'),  web.form.Textbox('days_of_week', description='День недели'),
                           web.form.Textbox('startTime', description='Время начала', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
@@ -80,37 +81,42 @@ class Renter:
     def POST(self, renter_id):
         print "ИТЕРАТОР В КЛАССЕ РЕНТЕР _ ПОСТ"
         form = self.form()
-        form2 = self.form()
+        form2 = self.form2()
+        form3 = self.form3()
         form4 = self.form4()
         if not form.validates():
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
         if not form2.validates():
+            raise web.seeother('/renter/'+str(renter_id)+"/", True)
+        if not form3.validates():
             raise web.seeother('/renter/'+str(renter_id)+"/", True)
         if not form4.validates():
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
 
 
         people_id = form.d.drop
-        if people_id == "-1" or form.d.FIO != "":
-            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM1111111 !!!!!!!!!"
+        if people_id != "-1" or form.d.FIO != "":
+            if form.d.name != None:
 
-            people_id = getNextId('people')
-            element = {"FIO": form.d.FIO,
-                       "phone": form.d.phone,
-                       "link": form.d.link,
-                       "id": people_id}
-            db.multiple_insert('people', values=[element])
-            ids = getNextId('renters_group')
-            element = {"name": form.d.name,
-                       "people_id": people_id,
-                       "renter_id": renter_id,
-                       "id": ids}
-            print "            HERE 1                HERE  73           HERE           73    ", element
-            db.multiple_insert("renters_group", values=[element])
-            print "                here 2         here 75               here          75|", renter_id, "|", ids, "|", people_id
-            db.insert('group_people', renter_id=renter_id, group_id=ids, people_id=people_id)
-        #Этот метод не знает о существовании form2, почему?
-        if renter_id == 2:# это условие многократно менялось
+                print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM1111111 !!!!!!!!!"
+
+                people_id = getNextId('people')
+                element = {"FIO": form.d.FIO,
+                           "phone": form.d.phone,
+                           "link": form.d.link,
+                           "id": people_id}
+                db.multiple_insert('people', values=[element])
+                ids = getNextId('renters_group')
+                element = {"name": form.d.name,
+                           "people_id": people_id,
+                           "renter_id": renter_id,
+                           "id": ids}
+                print "            HERE 1                HERE  73           HERE           73    ", element
+                db.multiple_insert("renters_group", values=[element])
+                print "                here 2         here 75               here          75|", renter_id, "|", ids, "|", people_id
+                db.insert('group_people', renter_id=renter_id, group_id=ids, people_id=people_id)
+
+        if form2.d.sum != None:
             print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM2222222 !!!!!!!!!"# не было видно ни разу в ее жизни!!
             dt_pays = datetime.now()
             print "HERE    HERE HERE |", dt_pays
@@ -122,6 +128,21 @@ class Renter:
                        "sum": form2.d.sum}
             db.multiple_insert('pays', values=[element])
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
+
+        if form3.d.startTime and form3.d.endTime != None:
+            if form3.d.drop != "-1":
+                start_dt_string2 = datetime.strptime(form3.d.start_time, "%d/%m/%Y %H:%M")
+                start_dt_unix2 = time.mktime(start_dt_string2.timetuple())
+                end_dt_string2 = datetime.strptime(form3.d.end_time, "%d/%m/%Y %H:%M")
+                end_dt_unix2 = time.mktime(end_dt_string2.timetuple())
+                element2 = {"id": getNextId("using_hall"),
+                           "name": form3.d.name,
+                           "group_id": form3.d.drop,
+                           #"hall_id": hall_id,!!!!!!
+                           "start_time": start_dt_unix2,
+                           "end_time": end_dt_unix2}
+                db.multiple_insert('using_hall', values=[element2])
+
 
 
         if form4.d.drop != "-1" and renter_id != "-1" and form4.d.cost != None:

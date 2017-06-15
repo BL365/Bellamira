@@ -7,7 +7,7 @@ A = function(hall) {
                 if (res == true) {
                     document.getElementById('form0').submit();
                 } else {
-                    alert("Указанное вемя занято");
+                    alert("Указанное время занято");
                 }
     });
     return false;
