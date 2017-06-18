@@ -1,5 +1,7 @@
+# coding: utf8
 import web
 from db_creator import dbCreator
+
 
 db = web.database(dbn='sqlite', db=dbCreator.dbName)
 
@@ -13,21 +15,28 @@ def getNextId(tableName):
 
 def getdropValues():
     people = db.select("people", order="FIO")
-    dropValue = [(-1, "Add")]
+    dropValue = [(-1, "Выберите")]
     for p in people:
         dropValue.append((p["id"], p["FIO"]))
     return dropValue
 
 def getdropValues2():
     people = db.query('SELECT renters_group.id AS r_id, renters.name || ", " || renters_group.name as name FROM (renters_group Inner Join renters on renters_group.renter_id = renters.id)')
-    dropValue = [(-1, "Add")]
+    dropValue = [(-1, "Выберите")]
     for p in people:
         dropValue.append((p["r_id"], p["name"]))
     return dropValue
 
 def getdropValues3():
     hall = db.select("hall", order="name")
-    dropValue = [(-1, "Add")]
+    dropValue = [(-1, "Выберите")]
     for h in hall:
         dropValue.append((h["id"], h["name"]))
+    return dropValue
+
+def getdropValues4():
+    days_of_week = db.select("days_of_week", order="id")
+    dropValue = [(-1, "Выберите")]
+    for d in days_of_week:
+        dropValue.append((d["no"], d["name"]))
     return dropValue
