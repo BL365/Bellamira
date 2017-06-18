@@ -34,9 +34,9 @@ def getdropValues3():
         dropValue.append((h["id"], h["name"]))
     return dropValue
 
-# def getdropValues4():
-#     days_of_week = db.select("days_of_week", order="id")
-#     dropValue = [(-1, "Выберите")]
-#     for d in days_of_week:
-#         dropValue.append((d["no"], d["name"]))
-#     return dropValue
+def getdropValues4():
+    days_of_week = db.select("days_of_week", order="id")
+    dropValue = [(-1, "Выберите")]
+    for d in days_of_week:
+        dropValue.append((d["no"], d["name"]))
+    return dropValue
