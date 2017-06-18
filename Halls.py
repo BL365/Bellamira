@@ -43,12 +43,14 @@ class Hall():
         sum = 0
 
         cost_table = db.query('SELECT using_hall.[hall_id], using_hall.[group_id], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id] AS RENTER, rate_renter.[days_of_week] AS DAYS_IND_RATE, rate_renter.[start_time] AS ST_T_IND_RATE, rate_renter.[end_time] AS EN_T_IND_RATE, rate_renter.[cost] AS IND_COST, time_zone.[days_of_week] AS DAYS_ST_RATE, time_zone.[start_time] AS ST_T_ST_RATE, time_zone.[end_time] AS EN_T_ST_RATE, time_zone.[cost] AS STAND_COST FROM using_hall INNER JOIN renters_group ON using_hall.[group_id] = renters_group.[id] INNER JOIN rate_renter ON renters_group.[renter_id] = rate_renter.[renter_id] INNER JOIN time_zone ON using_hall.[hall_id] = time_zone.[hall_id]')
-        hall_cost_table = []
+        hall_cost_table = []        #sdelat sopostavlenie vremeni zaniatia i tarifa, rascheta stoimosti
         for c in cost_table:
             if c['hall_id'] == hall_id:
                 hall_cost_table.append(c)
-        hall_cost_table
-        #zapros rabotaet, ne znau kak sdelat sopostavlenie vremeni zaniatia i tarifa, rascheta stoimosti
+        # if hall_cost_table != None:
+        #     for h in hall_cost_table:
+
+
 
 
         for e in events:

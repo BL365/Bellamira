@@ -17,11 +17,11 @@ class Renter:
     form2 = web.form.Form(web.form.Textbox('date', description='Дата'),
                           web.form.Textbox('sum', description='Сумма'))
 
-    form3 = web.form.Form(web.form.Textbox('name', description='Название'), web.form.Dropdown('drop', [], description='Группа'),
+    form3 = web.form.Form(web.form.Textbox('name', description='Название'), web.form.Dropdown('drop2', [], description='Зал'), web.form.Dropdown('drop', [], description='Группа'),
         web.form.Textbox('start_time', pattern="\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2}", size="16", maxlength="16", id="st_t", description='Время начала'),
         web.form.Textbox('end_time', pattern="\\d{1,2}\/\\d{1,2}\/\\d{4}\\s\\d{1,2}:\\d{1,2}", size="16", maxlength="16", id="end_t", description='Время окончания'))
 
-    form4 = web.form.Form(web.form.Dropdown('drop', [], description='Зал'),  web.form.Textbox('days_of_week', description='День недели'),
+    form4 = web.form.Form(web.form.Dropdown('drop', [], description='Зал'), # web.form.Dropdown('drop2', [], description='День недели'),
                           web.form.Textbox('startTime', description='Время начала', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
                           web.form.Textbox('endTime', description='Время окончания', pattern="\\d{1,2}:\\d{1,2}", size="5", maxlength="5"),
                           web.form.Textbox('cost', description='Стоимость часа'))
@@ -35,25 +35,30 @@ class Renter:
         pays = db.select("pays", where='renter_id = $renter_id', vars=locals())
         rate = db.select('rate_renter', where='renter_id=$renter_id', vars=locals())
         events_groups = db.query('SELECT using_hall.[name], using_hall.[hall_id], using_hall.[group_id], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id] AS renter, renters_group.[name] AS group_name, hall.[name] AS hall_name FROM renters_group INNER JOIN using_hall ON renters_group.[id] = using_hall.[group_id] INNER JOIN hall ON using_hall.[hall_id] = hall.[id]')
+        cost_table = db.query('SELECT using_hall.[hall_id], using_hall.[group_id], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id] AS RENTER, rate_renter.[days_of_week] AS DAYS_IND_RATE, rate_renter.[start_time] AS ST_T_IND_RATE, rate_renter.[end_time] AS EN_T_IND_RATE, rate_renter.[cost] AS IND_COST, time_zone.[days_of_week] AS DAYS_ST_RATE, time_zone.[start_time] AS ST_T_ST_RATE, time_zone.[end_time] AS EN_T_ST_RATE, time_zone.[cost] AS STAND_COST FROM using_hall INNER JOIN renters_group ON using_hall.[group_id] = renters_group.[id] INNER JOIN rate_renter ON renters_group.[renter_id] = rate_renter.[renter_id] INNER JOIN time_zone ON using_hall.[hall_id] = time_zone.[hall_id]')
+        # days = db.select('days_of_week', vars=locals())
+
         form = self.form()
         form.drop.args = getdropValues()
         form2 = self.form2()
         form3 = self.form3()
+        # templ = getdropValues3()
+        # form3.drop2.args = getdropValues3()
+        # form3.drop.args = getdropValues2()
         form4 = self.form4()
-
         temp = getdropValues3()
         form4.drop.args = temp
+        # form4.drop2.args = getdropValues4()
 
         uppd_ev_groups = []
         for e in events_groups:
-            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEE ИТератор в цикле"
             e['start_time'] = datetime.fromtimestamp(e['start_time']).strftime("%d/%m/%Y (%a) %H:%M")
             e['end_time'] = datetime.fromtimestamp(e['end_time']).strftime("%d/%m/%Y (%a) %H:%M")
-            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEE   сравнение.", e['renter'], "|", renter_id
-            if e['renter'] == renter_id:
-                uppd_ev_groups.append(e)
-                print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEE ИТератор в добавил v uppd!!"
-        print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEE ИТератор прошел цикл|", uppd_ev_groups
+        #     print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEE   сравнение.", type(e['renter']), e['renter'], "|", type(renter_id), renter_id
+        #     if e['renter'] == int(renter_id):
+        #         uppd_ev_groups.append(e)
+        #         print "HEEEEEERRRREEEEE ИТератор в добавил v uppd!!"
+        # print "HERREEE ИТератор прошел цикл|", uppd_ev_groups
 
 
         updated_rate = []
@@ -62,10 +67,15 @@ class Renter:
             hours = r['start_time'] / 3600
             minutes = r['start_time'] % 3600 / 60
             r['start_time'] = "%02d:%02d" % (hours, minutes)
-
             hours = r['end_time'] / 3600
             minutes = r['end_time'] % 3600 / 60
             r['end_time'] = "%02d:%02d" % (hours, minutes)
+            #
+            # for d in days:
+            #     print "HHHEEEERRRRRREEEEEEEE   |", type(r['days_of_week']), r['days_of_week'], "|||",type(d['no']), d['no']
+            #     if int(r['days_of_week']) == d['no']:
+            #         r['days_of_week'] = d['name']
+
             for t in temp:
                 if t[0] == r['hall_id']:
                     r['hall_id'] = t[1]
@@ -75,6 +85,31 @@ class Renter:
         for p in pays:
             p['date'] = datetime.fromtimestamp(p['date']).strftime("%d/%m/%Y (%a) %H:%M")
             updeted_pays.append(p)
+
+
+        # if cost_table and rate != None:
+        #     a = ""
+        #
+        #
+        #     for c in cost_table:
+        #         c['start_time'] = datetime.fromtimestamp(c['start_time'])
+        #         c['end_time'] = datetime.fromtimestamp(c['end_time'])
+        #         for r in rate:
+        #             if c['hall_id'] == r['hall_id']:
+        #                 if c['start_time'].weekday() == r['days_of_week']:
+        #                     if not c['start_time'] and c['end_time'] > r['start_time'] and r['end_time'] or c['start_time'] and c['end_time'] < r['start_time'] and r['end_time']:
+        #                         a = "есть пересечение"
+        #                         if not r['start_time'] > c['start_time'] and c['end_time'] < r['end_time'] or r['start_time'] < c['start_time'] and c['end_time'] > r['end_time']:
+        #                             #if r['start_time'] > c['start_time'] and r['start_time'] < c['end_time']: надо ли эту проверку уже?
+        #                             #здесь высчет совпадающих часов
+        #                         #сложить все часы этого тарифа и умножить на cost
+
+
+
+
+
+
+
         print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEE ИТератор перед return|"
         return render.renter(renter, renter_man, groups, people, updated_rate, updeted_pays, uppd_ev_groups, form, form2, form3, form4)
 
@@ -117,35 +152,35 @@ class Renter:
                 db.insert('group_people', renter_id=renter_id, group_id=ids, people_id=people_id)
 
         if form2.d.sum != None:
-            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM2222222 !!!!!!!!!"# не было видно ни разу в ее жизни!!
+            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM2222222 !!!!!!!!!"
             dt_pays = datetime.now()
             print "HERE    HERE HERE |", dt_pays
             dt_p = time.mktime(dt_pays.timetuple())
             print "HERE    HERE HERE |", dt_p
             element = {"id": getNextId("pays"),
-                       "date": dt_p,
+                       "date": form2.d.date,
                        "renter_id": renter_id,
                        "sum": form2.d.sum}
             db.multiple_insert('pays', values=[element])
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
 
-        if form3.d.startTime and form3.d.endTime != None:
-            if form3.d.drop != "-1":
-                start_dt_string2 = datetime.strptime(form3.d.start_time, "%d/%m/%Y %H:%M")
-                start_dt_unix2 = time.mktime(start_dt_string2.timetuple())
-                end_dt_string2 = datetime.strptime(form3.d.end_time, "%d/%m/%Y %H:%M")
-                end_dt_unix2 = time.mktime(end_dt_string2.timetuple())
-                element2 = {"id": getNextId("using_hall"),
-                           "name": form3.d.name,
-                           "group_id": form3.d.drop,
-                           #"hall_id": hall_id,!!!!!!
-                           "start_time": start_dt_unix2,
-                           "end_time": end_dt_unix2}
-                db.multiple_insert('using_hall', values=[element2])
+        # if form3.d.start_time and form3.d.end_time != None and form3.d.drop != "-1" and form3.d.drop2 != "-1":
+        #     start_dt_string2 = datetime.strptime(form3.d.start_time, "%d/%m/%Y %H:%M")
+        #     start_dt_unix2 = time.mktime(start_dt_string2.timetuple())
+        #     end_dt_string2 = datetime.strptime(form3.d.end_time, "%d/%m/%Y %H:%M")
+        #     end_dt_unix2 = time.mktime(end_dt_string2.timetuple())
+        #
+        #     element2 = {"id": getNextId("using_hall"),
+        #                "name": form3.d.name,
+        #                "group_id": form3.d.drop,
+        #                "hall_id": drop2,
+        #                "start_time": start_dt_unix2,
+        #                "end_time": end_dt_unix2}
+        #     db.multiple_insert('using_hall', values=[element2])
 
 
 
-        if form4.d.drop != "-1" and renter_id != "-1" and form4.d.cost != None:
+        if form4.d.drop != "-1" and renter_id != "-1" and form4.d.cost != None and form4.d.drop2 != "-1" :
             print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM444444444 !!!!!!!!!"
             HALL_ID = form4.d.drop
             rate_id = getNextId('rate_renter')
@@ -156,7 +191,7 @@ class Renter:
             enSec = int(enT[0:2]) * 3600 + int(enT[3:5]) * 60
             element2 = {"hall_id": HALL_ID,
                         "renter_id": renter_id,
-                        "days_of_week": form4.d.days_of_week,
+                        "days_of_week": form4.d.drop2,
                         "start_time": stSec,
                         "end_time": enSec,
                         "cost": form4.d.cost,
@@ -208,6 +243,6 @@ class Renters:
 class DelRenter:
 
     def GET(self, renter_id):
-        print "                   HEREEEEEEEEEEEEEE          |",  renter_id #this print does not work --> error in url?
+        print "                   HEREEEEEEEEEEEEEE          |",  renter_id
         db.delete('renters', where='id=$renter_id', vars=locals())
         raise web.seeother('/renters/', True)

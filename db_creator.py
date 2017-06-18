@@ -71,7 +71,7 @@ class dbCreator:
     createTableTimeZoneSQL = """CREATE TABLE IF NOT EXISTS time_zone (
         id INT AUTO_INCREMENT,
         hall_id INT,
-        days_of_week TEXT,
+        days_of_week INT,
         start_time INT,
         end_time INT,
         cost REAL,
@@ -81,7 +81,7 @@ class dbCreator:
     createTableRateRenter = """CREATE TABLE IF NOT EXISTS rate_renter (
         id INT AUTO_INCREMENT,
         hall_id INT,
-        days_of_week TEXT,
+        days_of_week INT,
         renter_id INT,
         start_time INT,
         end_time INT,
@@ -113,7 +113,12 @@ class dbCreator:
         primary key (id)
     )"""
 
-
+    createTableDays = """CREATE TABLE IF NOT EXISTS days_of_week (
+        id INT AUTO_INCREMENT,
+        no INT,
+        name TEXT,
+        primary key (id)
+    )"""
 
 
     def execute(self):
@@ -131,6 +136,7 @@ class dbCreator:
             conn.execute(self.createTableHallUsingSQL)
             conn.execute(self.createTablePaysSQL)
             conn.execute(self.createTableRateRenter)
+            conn.execute(self.createTableDays)
 
         except OperationalError, msg:
             print msg

@@ -21,13 +21,16 @@ class CheckTime():
         result = True
 
         for t in TIME_old:
-            print t["start_time"], ">=", en_new,"(", t["start_time"] >= en_new,") or", t["end_time"], "<=", st_new, "(",t["end_time"] <= st_new,")"
-            if not (t["start_time"] >= en_new or t["end_time"] <= st_new):
-
+            if en_new == st_new:
                 result = False
-                print "        time is busy:         ", t["start_time"],">", en_new," or",  t["end_time"], "<", st_new
-                break
+            elif en_new != st_new:
+                print t["start_time"], ">=", en_new, "(", t["start_time"] >= en_new,") or", t["end_time"], "<=", st_new, "(",t["end_time"] <= st_new,")"
+                if not (t["start_time"] >= en_new or t["end_time"] <= st_new):
 
+                    result = False
+                    print "        time is busy:         ", t["start_time"],">", en_new," or",  t["end_time"], "<", st_new
+                    break
+            
         print result
 
         return (json.dumps({'result': result}))
