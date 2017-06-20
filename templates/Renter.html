@@ -138,7 +138,7 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
     <tr><h3>Добавление занятия</h3></tr>
     <tr>
         <td>
-            <form class="form"  action="/using/$renter.id/" method="post">
+            <form class="form"  action="/renter/$renter.id/" method="post">
                 $:form3.render()
                 <input type="submit" value="Добавить">
             </form>

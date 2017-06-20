@@ -155,28 +155,32 @@ class Renter:
             print "HERE!!!", type(form.d.other), form.d.other
             print "HERE!!!", type(form.d.drop), form.d.drop
             group_id = getNextId('renters_group')
-            if form.d.other == True and form.d.drop != "-1":
+            print form, "here form1"
+            if form.d.other == False and form.d.drop != "-1":
 
                 element = {"id": group_id,
                            "people_id": form.d.drop,
                            "name": form.d.name,
                            "renter_id": renter_id
                 }
-                db.insert('renters_group', element)
-                db.insert('group_people', renter_id=renter_id, group_id=group_id, people_id=form.d.drop)
-            elif form.d.other == True and form.d.FIO != None and form.d.link != None and form.d.phone != None:
+                print "True ", group_id, form.d.drop, form.d.name, renter_id
+                # db.insert('renters_group', element)
+                # db.insert('group_people', renter_id=renter_id, group_id=group_id, people_id=form.d.drop)
+            elif form.d.other == True and form.d.FIO != None and form.d.link != None and form.d.phone != None and form.d.drop == "-1":
                 element = {"FIO": form.d.FIO,
                            "phone": form.d.phone,
                            "link": form.d.link,
                            "id": people_id}
-                db.multiple_insert('people', values=[element])
+                print "False ", form.d.FIO, form.d.phone, form.d.link, people_id
+                # db.multiple_insert('people', values=[element])
                 element = {"id": group_id,
                            "people_id": people_id,
                            "name": form.d.name,
                            "renter_id": renter_id
                            }
-                db.multiple_insert("renters_group", values=[element])
-                db.insert('group_people', renter_id=renter_id, group_id=group_id, people_id=people_id)
+                print "false ", group_id, people_id, form.d.name, renter_id
+                # db.multiple_insert("renters_group", values=[element])
+                # db.insert('group_people', renter_id=renter_id, group_id=group_id, people_id=people_id)
 
         if form2.d.sum != None:
             print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM2222222 !!!!!!!!!",  form2.d.date, form2.d.sum
