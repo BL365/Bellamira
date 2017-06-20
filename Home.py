@@ -10,12 +10,11 @@ class Home:
     )
 
 
-    def GET(self, auth):
+    def GET(self):
         form = self.form
 
 
-
-        render.Home(form)
+        return render.Home(form)
 
 
     def POST(self, log, pas):

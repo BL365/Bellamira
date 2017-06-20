@@ -5,6 +5,7 @@ from Renters import Renters, Renter, DelRenter
 from Group import Group, DeletePeopleFromGroup
 from Index import Index
 from Home import Home
+from Del_events import DelEvent, DelPay, DelTimezone, DelIndRate, DelGroup, DelPeople
 from Common import urls
 
 

@@ -25,7 +25,7 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
                     <td bgcolor="03a2d3">$gr.id</td>
                     <td bgcolor="afcde7"><a href="/renter/$renter.id/$gr.id/">$gr.name</a></td>
                     <td bgcolor="afcde7">
-                        <form>
+                        <form action="/DelGroup/$renter.id/$gr.id/">
                             <input type="submit" value="Удалить">
                         </form>
                     </td>
@@ -49,7 +49,7 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
                     <td bgcolor="afcde7">$p.phone</td>
                     <td bgcolor="afcde7"><a href="$p.link">$p.link</a></td>
                     <td bgcolor="afcde7">
-                        <form>
+                        <form action="/DelPeople/$renter.id/$p.id/" method="get">
                             <input type="submit" value="Удалить">
                         </form>
                     </td>
@@ -82,7 +82,7 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
                     <td bgcolor="afcde7">$p.date</td>
                     <td bgcolor="afcde7">$p.sum</td>
                     <td bgcolor="afcde7">
-                        <form>
+                        <form action="/DelPay/$renter.id/$p.id/">
                             <input type="submit" value="Удалить">
                         </form>
                     </td>
@@ -97,10 +97,10 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
                         <th bgcolor="03a2d3">Сумма</th>
                         <th bgcolor="03a2d3">Удаление</th>
                     </tr>
-                    $for p in people:
+
                     <tr>
-                        <td bgcolor="03a2d3">$p.id</td>
-                        <td bgcolor="afcde7">$p.FIO</td>
+                        <td bgcolor="03a2d3"></td>
+                        <td bgcolor="afcde7"></td>
 
                         <td bgcolor="afcde7">
                             <form>
@@ -118,10 +118,10 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
                         <th bgcolor="03a2d3">Сумма</th>
                         <th bgcolor="03a2d3">Удаление</th>
                     </tr>
-                    $for p in people:
+
                     <tr>
-                        <td bgcolor="03a2d3">$p.id</td>
-                        <td bgcolor="afcde7">$p.FIO</td>
+                        <td bgcolor="03a2d3"></td>
+                        <td bgcolor="afcde7"></td>
 
                         <td bgcolor="afcde7">
                             <form>
@@ -199,7 +199,7 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
                     <td bgcolor="afcde7">$r.end_time</td>
                     <td bgcolor="afcde7">$r.cost</td>
                     <td bgcolor="afcde7">
-                        <form>
+                        <form action="/DelIndRate/$renter.id/$r.id/">
                             <input type="submit" value="Удалить">
                         </form>
                     </td>

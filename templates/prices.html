@@ -32,7 +32,7 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
                     <td bgcolor="afcde7">$e.start_time</td>
                     <td bgcolor="afcde7">$e.end_time</td>
                     <td bgcolor="afcde7">
-                        <form>
+                        <form action="/DelEvent/$hall.id/$e.id" method="get">
                             <input type="submit" value="Удалить">
                         </form>
                     </td>
@@ -71,7 +71,7 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
                     <td bgcolor="afcde7">$z.end_time</td>
                     <td bgcolor="afcde7">$z.cost</td>
                     <td bgcolor="afcde7">
-                        <form>
+                        <form action="/DelTimezone/$hall.id/$z.id/">
                             <input type="submit" value="Удалить">
                         </form>
                     </td>
