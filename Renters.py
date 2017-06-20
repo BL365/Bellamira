@@ -152,35 +152,41 @@ class Renter:
         if form.d.name != None:
             print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM1111111 !!!!!!!!!"
             people_id = getNextId('people')
-            print "HERE!!!", type(form.d.other), form.d.other
+            # print "HERE!!!", type(form.d.other), form.d.other
             print "HERE!!!", type(form.d.drop), form.d.drop
             group_id = getNextId('renters_group')
             print form, "here form1"
-            if form.d.other == False and form.d.drop != "-1":
+            form.d.drop = int(form.d.drop)
+            renter_id = int(renter_id)
+            if form.d.drop != "-1":
 
                 element = {"id": group_id,
                            "people_id": form.d.drop,
                            "name": form.d.name,
-                           "renter_id": renter_id
-                }
-                print "True ", group_id, form.d.drop, form.d.name, renter_id
-                # db.insert('renters_group', element)
-                # db.insert('group_people', renter_id=renter_id, group_id=group_id, people_id=form.d.drop)
-            elif form.d.other == True and form.d.FIO != None and form.d.link != None and form.d.phone != None and form.d.drop == "-1":
-                element = {"FIO": form.d.FIO,
-                           "phone": form.d.phone,
-                           "link": form.d.link,
-                           "id": people_id}
-                print "False ", form.d.FIO, form.d.phone, form.d.link, people_id
-                # db.multiple_insert('people', values=[element])
-                element = {"id": group_id,
-                           "people_id": people_id,
-                           "name": form.d.name,
-                           "renter_id": renter_id
-                           }
-                print "false ", group_id, people_id, form.d.name, renter_id
-                # db.multiple_insert("renters_group", values=[element])
-                # db.insert('group_people', renter_id=renter_id, group_id=group_id, people_id=people_id)
+                           "renter_id": renter_id}
+                print "True ", type(group_id), group_id, type(people_id), people_id, type(form.d.name), form.d.name, type(renter_id), renter_id, type(form.d.drop), form.d.drop
+                db.multiple_insert("renters_group", values=[element])
+                db.insert("group_people", renter_id=renter_id, group_id=group_id, people_id=form.d.drop)
+            elif form.d.drop == "-1":
+                print form.d.FIO, form.d.phone
+                if form.d.FIO != "" and form.d.phone != "":
+                    element = {"FIO": form.d.FIO,
+                               "phone": form.d.phone,
+                               "link": form.d.link,
+                               "id": people_id}
+                    print "False ", form.d.FIO, form.d.phone, form.d.link, people_id
+                    db.multiple_insert('people', values=[element])
+                    element = {"id": group_id,
+                               "people_id": people_id,
+                               "name": form.d.name,
+                               "renter_id": renter_id
+                               }
+                    print "false ", type(group_id), group_id, type(people_id), people_id, type(form.d.name), form.d.name, type(renter_id), renter_id
+
+                    db.multiple_insert("renters_group", values=[element])
+                    db.insert("group_people", renter_id=renter_id, group_id=group_id, people_id=people_id)
+        raise web.seeother('/renter/' + str(renter_id) + "/", True)
+
 
         if form2.d.sum != None:
             print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM2222222 !!!!!!!!!",  form2.d.date, form2.d.sum
@@ -249,7 +255,7 @@ class Renter:
                            "hall_id": form3.d.drop2,
                            "start_time": start_dt_unix2,
                            "end_time": end_dt_unix2}
-                db.multiple_insert('using_hall', values=[element2])
+                db.multiple_insert("using_hall", values=[element2])
 
 
 
