@@ -17,7 +17,7 @@ class Home:
         return render.Home(form)
 
 
-    def POST(self, log, pas):
+    def POST(self):
 
         form = self.form()
         if not form.validates():

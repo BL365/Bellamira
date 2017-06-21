@@ -1,16 +1,66 @@
 $def with (form)
-<h1>Здарова</h1>
-<a href="/renters/">К списку арендаторов</a>
-<a href="/halls/">К списку залов</a>
+<style>
 
+ html { height: 100%; }
+   body {
+    margin: 0; /* Убираем отступы */
+    height: 100%; /* Высота страницы */
+    background: url(http://dengi.bm.img.com.ua/dengi/orig/c/17/9d97c164367c10de610f37d11120e17c.jpg); /* Параметры фона */
+    background-size: cover; /* Фон занимает всю доступную площадь */
+    background-attachment:fixed;
+   }
+</style>
 <table width="100%" border="1">
+    <!--<tr>-->
+        <!--<td width="5%"></td>-->
+        <!--<td width="5%"></td>-->
+        <!--<td align="right"><h4>Администратор?</h4></td></tr>-->
     <tr>
-        <td>
-        <form action="/home/" method="post">
-            $:form.render()
-        <input type="submit" value="Добавить">
+        <td width="5%"></td>
+        <td align="right" height="5%">
+
+            <!--<h4>Авторизуйтесь!</h4>-->
+            <form action="/home/" method="post">
+                $:form.render()
+            <input type="submit" value="Я - администратор">
+                <!--<a href="/renters/">К списку арендаторов</a>-->
+                <!--<a href="/halls/">К списку залов</a>-->
         </form>
         </td>
+    </tr>
+    <tr>
+        <td width="5%"></td>
+        <td width="40%" align="left">
+        <h3>Хотите найти зал для занятия танцами? Ищете место,<p>
+где можно провести мастер-класс, подтянуть танцевальные<p>
+способности или провести время с пользой?<p>
+Для реализации этих целей рекомендуем воспользоваться<p>
+услугами «Белламира-Холл»! Вы можете использовать<p>
+большие залы со всем необходимым оборудованием<p>
+по своему усмотрению,и в любое удобное для вас время.<p>
+Почасовая аренда позволит вам держат себя в тонусе,<p>
+а долгосрочная – обеспечит качественную подготовку<p>
+        к грядущему выступлению!</h3>
+        </td>
+    </tr>
+    <tr>
+        <td width="5%"></td>
+        <td width="60%" border="1" bordercolor="03a2d3"><img src="https://pp.userapi.com/c637523/v637523676/7d3bb/6MiE_TuKjpI.jpg"></td>
 
     </tr>
+    <tr>
+        <td width="5%"></td>
+        <td align="center"><h2>Белый зал</h2></td>
+    </tr>
+    <tr>
+        <td width="5%"></td>
+        <td width="60%" border="1" bordercolor="03a2d3"><img src="https://pp.userapi.com/c637523/v637523676/7d3c4/fkiJeMzvRMM.jpg"></td>
+
+    </tr>
+    <tr>
+        <td width="5%"></td>
+        <td align="center"><h2>Коралловый зал</h2></td>
+    </tr>
+
 </table>
+
