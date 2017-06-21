@@ -64,36 +64,6 @@ class Renter:
                     uppd_ev_groups.append(e)
             print "HERREEE ИТератор прошел цикл|"
 
-
-        updated_rate = []
-        for r in rate:#этот цикл перебирает все индивидуальные тарифы, для преобразования значений, в более удобные для чтения со страницы
-            #print "начало  in rate|", type(r['days_of_week']), r['days_of_week']
-            r['days_of_week'] = int(r['days_of_week'])
-            #print "после преобразования|", type(r['days_of_week']), r['days_of_week']
-            hours = r['start_time'] / 3600
-            minutes = r['start_time'] % 3600 / 60#здесь время переводится в часы и минуты
-            r['start_time'] = "%02d:%02d" % (hours, minutes)
-            hours = r['end_time'] / 3600
-            minutes = r['end_time'] % 3600 / 60
-            r['end_time'] = "%02d:%02d" % (hours, minutes)
-            for d in drop_hall:  # здесь id заменяется названием
-                #print "цикл дроп-зал", type(d[0]), d[0], type(r['hall_id']), r['hall_id']
-                if d[0] == r['hall_id']:
-                    r['hall_id'] = d[1]
-                    updated_rate.append(r) # здесь формируется список тарифов, без замены дня недели с номера на сокращенное название
-        updated_rate1 = []
-        for up in updated_rate:
-            print type(days)
-            for dn in days:  # здесь номер дня недели тарифа заменяется названием. В этот цикл итератор заходит только 1 раз
-                #print "начало итерации дней"
-                print "HEEEEREEEEEEEEE  ДНИ перед сравнением", type(up['days_of_week']), up['days_of_week'], "|", type(dn['no']), dn['no']
-                if up['days_of_week'] == dn['no']:
-                    up['days_of_week'] = dn['name']
-                    updated_rate1.append(up) # здесь, по идее, это должно изменяться
-                    print "произведена замена|", type(up['days_of_week']), up['days_of_week'], "|", type(dn['no']), dn['no']
-                print "выход из days", type(up['days_of_week']), up['days_of_week'], "|", type(dn['no']), dn['no']
-            print "end step updRate", type(up['days_of_week']), up['days_of_week'], type(up['id']), up['id']
-
         if pays != None:
             updeted_pays = []
             print "HEEEERREEEEEE ИТератор перед pays|"
@@ -101,36 +71,82 @@ class Renter:
                 p['date'] = datetime.fromtimestamp(p['date']).strftime("%d/%m/%Y (%a) %H:%M")
                 updeted_pays.append(p)
 
-            # if cost_table and rate != None:
-            #     a = ""
-            #     delta = 0
-            #     cost = 0
-            #     print "HEEEERREEEEEE ИТератор вошел в таблицу"
-            #     for c in cost_table:
-            #         c['start_time'] = datetime.fromtimestamp(c['start_time'])
-            #         c['end_time'] = datetime.fromtimestamp(c['end_time'])
-            #         for r in rate:
+        ind_rate_sum = 0
+        rate2 = rate
+        updated_rate = []
+        for i in rate:
+            # print "начало  in rate|", type(i['days_of_week']), i['days_of_week']
+            i['days_of_week'] = str(i['days_of_week'])
+            # print "после преобразования|", type(i['days_of_week']), i['days_of_week']
+            hours = i['start_time'] / 3600
+            minutes = i['start_time'] % 3600 / 60  # здесь время переводится в часы и минуты
+            i['start_time'] = "%02d:%02d" % (hours, minutes)
+            hours = i['end_time'] / 3600
+            minutes = i['end_time'] % 3600 / 60
+            i['end_time'] = "%02d:%02d" % (hours, minutes)
+            for d in drop_hall:# здесь id заменяется названием
+                # print "цикл дроп-зал", type(d[0]), d[0], type(i['hall_id']), i['hall_id']
+                if d[0] == i['hall_id']:
+                    i['hall_id'] = d[1]
+                    updated_rate.append(i)# здесь формируется список тарифов, без замены дня недели с номера на сокращенное название
+        # updated_rate1 = []
+        # for up in updated_rate:
+        #     print type(days)
+        #     for dn in days:  # здесь номер дня недели тарифа заменяется названием. В этот цикл итератор заходит только 1 раз
+        #         # print "начало итерации дней"
+        #         # up['days_of_week'] = str(up['days_of_week'])
+        #         dn['no'] = str(dn['no'])
+        #         print "HEEEEREEEEEEEEE  ДНИ перед сравнением", type(up['days_of_week']), up['days_of_week'], "|", type(
+        #             dn['no']), dn['no']
+        #         if up['days_of_week'] == dn['no']:
+        #             up['days_of_week'] = str(dn['name'])
+        #             updated_rate1.append(up)  # здесь, по идее, это должно изменяться
+        #             print "произведена замена|", type(up['days_of_week']), up['days_of_week'], "|", type(dn['no']), dn[
+        #                 'no']
+        #         print "выход из days", type(up['days_of_week']), up['days_of_week'], "|", type(dn['no']), dn['no']
+        #     print "end step updRate", type(up['days_of_week']), up['days_of_week'], type(up['id']), up['id']
+        if cost_table and rate2 != None:
+            delta = 0
+            cost = 0
+            rent_cost= []
+            print "HEEEERREEEEEE ИТератор вошел в таблицу"
+            for c in cost_table:#этот цикл принципиально не заходит ни в if ни в for
+                c['start_time'] = datetime.fromtimestamp(c['start_time'])
+                c['end_time'] = datetime.fromtimestamp(c['end_time'])
+                # print "c ReNTER", type(c['RENTER']), c['RENTER'], type(rate2), rate2
+                if c['RENTER'] == renter_id:
+                    rent_cost.append(c)
+        print "rent.cost", rent_cost
+            #     for r in rate2:
+            #         print "in rate", type(c['RENTER']), c['RENTER'], type(r['renter_id']), r['renter_id']
+            #         if c['RENTER'] == r['renter_id']:
             #             if c['hall_id'] == r['hall_id']:#тот ли зал
-            #                 print "HEEEERREEEEEE совпал зал|",  c['hall_id'], "|", r['hall_id']
+            #                 print "HEEREE совпал зал|",  c['hall_id'], "|", r['hall_id']
+            #                 r['days_of_week'] = int(r['days_of_week'])
+            #                 print "HEEEERREEEEEE день|", type(c['start_time'].weekday()), c['start_time'].weekday(), type(r['days_of_week']), r['days_of_week']
             #                 if c['start_time'].weekday() == r['days_of_week']:#тот ли день, если тот, то сначала преобразование в один тип исчисления с тарифами
             #                     print "HEEEERREEEEEE совпал день|"
             #                     c['start_time'] = time.mktime(c['start_time'].timetuple())
             #                     c['start_time'] = c['start_time'] % 86400
             #                     c['end_time'] = time.mktime(c['end_time'].timetuple())
             #                     c['end_time'] = c['end_time'] % 86400
-            #                     print "HEEEERREEEEEE время в секундах от начала суток|", c['start_time'], "|", c['end_time']
-            #                     if not c['start_time'] and c['end_time'] > r['start_time'] and r['end_time'] or c['start_time'] and c['end_time'] < r['start_time'] and r['end_time']:
-            #                         print "HEEEERREEEEEE есть пересечение"
-            #                         if not r['start_time'] > c['start_time'] and c['end_time'] < r['end_time'] or r['start_time'] < c['start_time'] and c['end_time'] > r['end_time']:# если не соблюдается - сложить все часы этого тарифа и умножить на cost, если соблюдается - искать пересекающиеся и считать
+            #                     if not c['start_time'] <= r['end_time'] or c['end_time'] >= r['start_time']:
+            #                         print "HEEEERREEEEEE нет пересечения"
+            #                         if c['start_time'] >= r['start_time'] and c['end_time'] <= r['end_time']:# если не соблюдается - сложить все часы этого тарифа и умножить на cost, если соблюдается - искать пересекающиеся и считать
             #                             print "HERE !!! |", a, "|искать часы"
-            #
-            #                         delta = r['end_time'] - r['start_time']
-            #                         cost = r['cost'] / delta #cost - стоимость секунды по этому тарифу
-            #                         cost = delta * cost #cost - стоимость всех секунд, т.е. стоимость всего периода тарифа
-            #                         print "HEEEERREEEEEE стоимость всего времени тарифа|", cost
-            #                     elif c['start_time'] and c['end_time'] > r['start_time'] and r['end_time'] or c['start_time'] and c['end_time'] < r['start_time'] and r['end_time']:
-            #                         print "пересечения с тарифом нет|", r['start_time'], "|", r['end_time']
-        print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEE ИТератор перед return|"
+            #                             delta = c['end_time'] - c['start_time']
+            #                             print "HEEEERREEEEEE стоимость использованного времени тарифа|"
+            #                         elif c['start_time'] > r['start_time'] and c['end_time'] <= r['end_time']:
+            #                             delta = c['end_time'] - r['start_time']
+            #                             print "HEEEERREEEEEE стоимость задействованного времени тарифа|"
+            #                         elif c['start_time'] < r['start_time'] and c['end_time'] >= r['end_time']:
+            #                             delta = r['end_time'] - c['start_time']
+            #                             print "HEEEERREEEEEE стоимость задействованного времени тарифа|", cost
+            #                         cost = r['cost'] / 3600
+            #                         cost = delta * cost
+            #                         ind_rate_sum = ind_rate_sum + cost#здесь скопится сумма по всем задействованным индивидуальным тарифам
+            # print "сумма за время арендованное по индивидуальным тарифам", ind_rate_sum
+        print "HEEEERRREEE ИТератор перед return|"
         return render.renter(renter, renter_man, groups, people, updated_rate, updeted_pays, uppd_ev_groups, form, form2, form3, form4)
 
     def POST(self, renter_id):

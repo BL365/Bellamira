@@ -6,7 +6,7 @@ from Common import *
 class Home:
 
     form = web.form.Form(
-        web.form.Textbox('log', description='Логин'), web.form.Textbox('pas', description='Пароль')
+        web.form.Textbox('log', description='Логин'), web.form.Password('pas', description='Пароль')
     )
 
 
