@@ -13,8 +13,16 @@ class Home:
     def GET(self):
         form = self.form
 
+        reg = 0
+        people = db.query('Select * from people')
+        for p in people:
+            if form.d.log == p['login']:
+                if form.d.pas == p['password']:
+                    print "AUTH!!!!!!!!"
+                    reg = 1
 
-        return render.Home(form)
+
+        return render.Home(form, reg)
 
 
     def POST(self):
@@ -23,9 +31,8 @@ class Home:
         if not form.validates():
             raise web.seeother('/home/', True)
 
-        print "token"
 
-
+        raise web.seeother('/home/', True)
 #
 #
 #
