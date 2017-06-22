@@ -1,18 +1,83 @@
 $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form2, form3, form4)
-<h3>$renter.name</h3>
-<h3>$renter_man.FIO</h3>
-<h3>$renter_man.phone <a href="$renter_man.link">$renter_man.link</a></h3>
+<table width="100%" border="0" align="left">
+    <td align="center" width="20%">
+        <h2>$renter.name</h2>
+        <h3>$renter_man.FIO</h3>
+        <h4>$renter_man.phone <a href="$renter_man.link">$renter_man.link</a></h4>
+    </td>
+    <td width="50%"></td>
+</table>
+<table width="100%" border="0" align="left">
+    <tr><h3>Добавление оплаты</h3></tr>
+    <tr>
+        <td width="400">
+            <div class="formR">
+            <form class="form" action="/renter/$renter.id/" method="post">
+                $:form2.render()
+                <input type="submit" value="Добавить">
+            </form>
+            </div>
+        </td>
+        <td width="325">
+            <h4>Лист оплат</h4>
+            <table border="0" bordercolor="000000" cellspacing="2">
+                <tr>
+                    <th bgcolor="03a2d3">id</th>
+                    <th bgcolor="03a2d3">Дата</th>
+                    <th bgcolor="03a2d3">Сумма</th>
+                    <th bgcolor="03a2d3">Удаление</th>
+                </tr>
+                $for p in pays:
+                <tr>
+                    <td bgcolor="03a2d3">$p.id</td>
+                    <td bgcolor="afcde7">$p.date</td>
+                    <td bgcolor="afcde7">$p.sum</td>
+                    <td bgcolor="afcde7">
+                        <form action="/DelPay/$renter.id/$p.id/">
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td  width="10%">
+            <h4>Финансовая сводка</h4>
+            <table border="0" bordercolor="000000" cellspacing="2">
+                <tr>
+                    <th bgcolor="03a2d3">Суммарная выплата</th>
+                    <th bgcolor="03a2d3">Задолженность</th>
+                    <th bgcolor="03a2d3">Переплата</th>
+                    <th bgcolor="03a2d3">Итоговый баланс</th>
+                </tr>
+                <tr>
+                    <td bgcolor="afcde7"> руб</td>
+                    <td bgcolor="afcde7"> руб</td>
+                    <td bgcolor="afcde7"> руб</td>
+                    <td bgcolor="afcde7"> руб</td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table border="0" bordercolor="000000" cellspacing="2">
 
+            </table>
+        </td>
+
+    </tr>
+</table>
 <table width="100%">
     <tr><h3>Добавление группы</h3></tr>
     <tr>
-        <td>
+        <td width="400">
+            <div class="formR">
             <form  class="form" action="/renter/$renter.id/" method="post">
                 $:form.render()
                 <input type="submit" value="Добавить">
             </form>
+            </div>
         </td>
         <td>
+
             <table border="0" bordercolor="000000" cellspacing="2">
                 <h4>Группы</h4>
                 <tr>
@@ -22,6 +87,7 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
                 </tr>
                 $for gr in groups:
                 <tr>
+                    <div class="table0">
                     <td bgcolor="03a2d3">$gr.id</td>
                     <td bgcolor="afcde7"><a href="/renter/$renter.id/$gr.id/">$gr.name</a></td>
                     <td bgcolor="afcde7">
@@ -29,8 +95,10 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
                             <input type="submit" value="Удалить">
                         </form>
                     </td>
+                    </div>
                 </tr>
             </table>
+
         </td>
         <td>
             <table border="0" bordercolor="000000" cellspacing="2">
@@ -59,75 +127,15 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
     </tr>
 </table>
 <table width="100%">
-    <tr><h3>Добавление оплаты</h3></tr>
-    <tr>
-        <td>
-            <form class="form" action="/renter/$renter.id/" method="post">
-                $:form2.render()
-                <input type="submit" value="Добавить">
-            </form>
-        </td>
-        <td>
-            <h4>Лист оплат</h4>
-            <table border="0" bordercolor="000000" cellspacing="2">
-                <tr>
-                    <th bgcolor="03a2d3">id</th>
-                    <th bgcolor="03a2d3">Дата</th>
-                    <th bgcolor="03a2d3">Сумма</th>
-                    <th bgcolor="03a2d3">Удаление</th>
-                </tr>
-                $for p in pays:
-                <tr>
-                    <td bgcolor="03a2d3">$p.id</td>
-                    <td bgcolor="afcde7">$p.date</td>
-                    <td bgcolor="afcde7">$p.sum</td>
-                    <td bgcolor="afcde7">
-                        <form action="/DelPay/$renter.id/$p.id/">
-                            <input type="submit" value="Удалить">
-                        </form>
-                    </td>
-                </tr>
-            </table>
-        </td>
-        <td>
-            <table border="0" bordercolor="000000" cellspacing="2">
-                    <h4>Задолженности</h4>
-                    <tr>
-                        <th bgcolor="03a2d3">id</th>
-                        <th bgcolor="03a2d3">Сумма</th>
-                    </tr>
-
-                    <tr>
-                        <td bgcolor="03a2d3"></td>
-                        <td bgcolor="afcde7"></td>
-                    </tr>
-                </table>
-        </td>
-        <td>
-            <table border="0" bordercolor="000000" cellspacing="2">
-                    <h4>Переплаты</h4>
-                    <tr>
-                        <th bgcolor="03a2d3">id</th>
-                        <th bgcolor="03a2d3">Сумма</th>
-                    </tr>
-
-                    <tr>
-                        <td bgcolor="03a2d3"></td>
-                        <td bgcolor="afcde7"></td>
-                    </tr>
-                </table>
-        </td>
-
-    </tr>
-</table>
-<table width="100%">
     <tr><h3>Добавление занятия</h3></tr>
     <tr>
-        <td>
+        <td width="400">
+            <div class="formR3">
             <form class="form"  action="/renter/$renter.id/" method="post">
                 $:form3.render()
                 <input type="submit" value="Добавить">
             </form>
+            </div>
         </td>
         <td>
             <table border="0" bordercolor="000000" cellspacing="2">
@@ -156,14 +164,16 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
         </td>
     </tr>
 </table>
-<table width="100%">
+<table width="100%" border="0">
     <tr>
         <h3>Добавление индивидуального тарифа</h3>
-        <td>
+        <td width="400">
+            <div class="formR4">
             <form class="form" action="/renter/$renter.id/" method="post">
                 $:form4.render()
                 <input type="submit" value="Добавить">
             </form>
+            </div>
         </td>
         <td>
             <table border="0" bordercolor="000000" cellspacing="2">
@@ -183,7 +193,7 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
                     <td bgcolor="afcde7">$r.days_of_week</td>
                     <td bgcolor="afcde7">$r.start_time</td>
                     <td bgcolor="afcde7">$r.end_time</td>
-                    <td bgcolor="afcde7">$r.cost</td>
+                    <td bgcolor="afcde7">$r.cost руб</td>
                     <td bgcolor="afcde7">
                         <form action="/DelIndRate/$renter.id/$r.id/">
                             <input type="submit" value="Удалить">

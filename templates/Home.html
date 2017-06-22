@@ -18,14 +18,15 @@ $def with (form, reg)
     <tr>
         <td width="5%"></td>
         <td align="right" height="5%">
-
+            <div class="form0">
             <!--<h4>Авторизуйтесь!</h4>-->
             <form action="/home/" method="post">
                 $:form.render()
             <input type="submit" value="Я - администратор">
+        </form></div>
+            <br>
                 <a href="/renters/">К списку арендаторов</a>
                 <a href="/halls/">К списку залов</a>
-        </form>
         </td>
     </tr>
     <tr>

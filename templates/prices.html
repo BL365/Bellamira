@@ -7,10 +7,12 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
     <h3>Мероприятия</h3>
     <tr>
         <td>
+            <div class="form1">
             <form class="form" action="/hall/$hall.id/" method="post" onsubmit="return A($hall.id);" id="form0">
                 $:form2.render()
                 <input type="submit" value="Добавить">
             </form>
+            </div>
         </td>
         <td width="10%"></td>
         <td>
@@ -47,10 +49,12 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
     </tr>
     <tr>
         <td>
+            <div class="form1">
             <form class="form" action="/hall/$hall.id/" method="post">
                 $:form.render()
                 <input type="submit" value="Добавить">
             </form>
+            </div>
         </td>
         <td width="15%"></td>
         <td>
@@ -84,10 +88,10 @@ $def with (hall, time_zones, form, form2, updeted_events, sum)
 
     <tr>
         <a href="/halls/">Вернуться к списку залов</a> <br>
-        <a href="/renters/">перейти к списку арендаторов</a>
+        <a href="/renters/">Перейти к списку арендаторов</a>
     </tr>
     <tr>
-    <h4>Суммарная стоимость аренды по залу *** руб</h4>
+    <!--<h4>Суммарная стоимость аренды по залу *** руб</h4>-->
     </tr>
 
 </table>

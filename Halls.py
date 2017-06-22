@@ -110,7 +110,7 @@ class DelHall:
         raise web.seeother('/halls/', True)
 
 class Halls:
-    form = web.form.Form(web.form.Textbox('name'), web.form.Textbox('square'))
+    form = web.form.Form(web.form.Textbox('name', description='Зал'), web.form.Textbox('square', description='Площаль'))
 
     def GET(self):
         halls = db.select('hall')

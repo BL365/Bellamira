@@ -10,7 +10,8 @@ import time
 class Renter:
     form = web.form.Form(
         web.form.Textbox('name', description='Название группы'), web.form.Dropdown('drop', [], description='Руководитель'),
-        web.form.Checkbox('other', description='Новый?'), web.form.Textbox('FIO', description='ФИО нового руководителя'),
+        # web.form.Checkbox('other', description='Новый?'),
+        web.form.Textbox('FIO', description='ФИО нового руководителя'),
         web.form.Textbox('phone', description='Телефон'), web.form.Textbox('link', description='Ссылка в соц. сетях')
     )
 
@@ -300,7 +301,8 @@ class Renters:
     form = web.form.Form(
         web.form.Textbox('name', description='Название организации'), web.form.Textbox('renter_link', description='Ссылка'),
         web.form.Textbox('renter_phone', description='Телефон'), web.form.Dropdown('drop', [(-1, "Add")], description='Выберите руководителя'),
-        web.form.Checkbox('other', description='Новый руководитель'), web.form.Textbox('FIO', description='ФИО руководителя'),
+        web.form.Checkbox('other', description='Новый руководитель'),
+        web.form.Textbox('FIO', description='ФИО руководителя'),
         web.form.Textbox('phone', description='Телефон'), web.form.Textbox('link', description='Ссылка в соц. сетях')
     )
 

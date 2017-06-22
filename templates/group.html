@@ -7,10 +7,12 @@ $def with (renter, renter_man, group, people, form)
 <table width="100%">
     <tr>
         <td>
+            <dev class="formR">
             <form action="/renter/$renter.id/$group.id/" method="post">
                 $:form.render()
                 <input type="submit" value="Добавить">
             </form>
+            </dev>
         </td>
         <td>
             <table border="0" bordercolor="000000" cellspacing="2">

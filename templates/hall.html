@@ -4,10 +4,12 @@ $def with (halls, form)
 <table width="100%">
     <tr>
         <td width="30%">
+            <div class="formHalls">
             <form  class="form" action="/halls/" method="post">
                 $:form.render()
                 <input type="submit" value="Добавить">
             </form>
+            </div>
         </td>
         <td width="45%"></td>
         <td>
