@@ -90,26 +90,28 @@ class Renter:
                 if d[0] == i['hall_id']:
                     i['hall_id'] = d[1]
                     updated_rate.append(i)# здесь формируется список тарифов, без замены дня недели с номера на сокращенное название
-        # updated_rate1 = []
-        # for up in updated_rate:
-        #     print type(days)
-        #     for dn in days:  # здесь номер дня недели тарифа заменяется названием. В этот цикл итератор заходит только 1 раз
-        #         # print "начало итерации дней"
-        #         # up['days_of_week'] = str(up['days_of_week'])
-        #         dn['no'] = str(dn['no'])
-        #         print "HEEEEREEEEEEEEE  ДНИ перед сравнением", type(up['days_of_week']), up['days_of_week'], "|", type(
-        #             dn['no']), dn['no']
-        #         if up['days_of_week'] == dn['no']:
-        #             up['days_of_week'] = str(dn['name'])
-        #             updated_rate1.append(up)  # здесь, по идее, это должно изменяться
-        #             print "произведена замена|", type(up['days_of_week']), up['days_of_week'], "|", type(dn['no']), dn[
-        #                 'no']
-        #         print "выход из days", type(up['days_of_week']), up['days_of_week'], "|", type(dn['no']), dn['no']
-        #     print "end step updRate", type(up['days_of_week']), up['days_of_week'], type(up['id']), up['id']
+        updated_rate1 = list(updated_rate)
+        updated_rate2 = []
+        days = list(days)
+        for up in updated_rate1:
+            print type(days)
+            for dn in days:  # здесь номер дня недели тарифа заменяется названием. В этот цикл итератор заходит только 1 раз
+                print "начало итерации дней"
+                # up['days_of_week'] = str(up['days_of_week'])
+                # dn['no'] = str(dn['no'])
+                print "HEEEEREEEEEEEEE  дни перед сравнением", type(up['days_of_week']), up['days_of_week'], "|", type(dn['no']), dn['no']
+                if type(dn['no']) != type(up['days_of_week']):
+                    dn['no'] = str(dn['no'])
+                    print "HEEEEREEEEEEEEE  после", type(up['days_of_week']), up[
+                        'days_of_week'], "|", type(dn['no']), dn['no']
+                if up['days_of_week'] == dn['no']:
+                    up['days_of_week'] = dn['name']
+                    updated_rate2.append(up)  # здесь, по идее, это должно изменяться
+
         if cost_table and rate2 != None:
             delta = 0
             cost = 0
-            rent_cost= []
+            rent_cost = []
             print "HEEEERREEEEEE ИТератор вошел в таблицу"
             for c in cost_table:#этот цикл принципиально не заходит ни в if ни в for
                 c['start_time'] = datetime.fromtimestamp(c['start_time'])
@@ -117,7 +119,7 @@ class Renter:
                 # print "c ReNTER", type(c['RENTER']), c['RENTER'], type(rate2), rate2
                 if c['RENTER'] == renter_id:
                     rent_cost.append(c)
-        print "rent.cost", rent_cost
+            print "rent.cost", rent_cost
             #     for r in rate2:
             #         print "in rate", type(c['RENTER']), c['RENTER'], type(r['renter_id']), r['renter_id']
             #         if c['RENTER'] == r['renter_id']:
@@ -132,7 +134,7 @@ class Renter:
             #                     c['end_time'] = time.mktime(c['end_time'].timetuple())
             #                     c['end_time'] = c['end_time'] % 86400
             #                     if not c['start_time'] <= r['end_time'] or c['end_time'] >= r['start_time']:
-            #                         print "HEEEERREEEEEE нет пересечения"
+            #                         print "HEEEERREEEEEE пересечение"
             #                         if c['start_time'] >= r['start_time'] and c['end_time'] <= r['end_time']:# если не соблюдается - сложить все часы этого тарифа и умножить на cost, если соблюдается - искать пересекающиеся и считать
             #                             print "HERE !!! |", a, "|искать часы"
             #                             delta = c['end_time'] - c['start_time']
@@ -146,9 +148,9 @@ class Renter:
             #                         cost = r['cost'] / 3600
             #                         cost = delta * cost
             #                         ind_rate_sum = ind_rate_sum + cost#здесь скопится сумма по всем задействованным индивидуальным тарифам
-            # print "сумма за время арендованное по индивидуальным тарифам", ind_rate_sum
+            print "сумма за время арендованное по индивидуальным тарифам", ind_rate_sum
         print "HEEEERRREEE ИТератор перед return|"
-        return render.renter(renter, renter_man, groups, people, updated_rate, updeted_pays, uppd_ev_groups, form, form2, form3, form4)
+        return render.renter(renter, renter_man, groups, people, updated_rate2, updeted_pays, uppd_ev_groups, form, form2, form3, form4)
 
     def POST(self, renter_id):
         print "ИТЕРАТОР В КЛАССЕ РЕНТЕР _ ПОСТ   "
@@ -202,7 +204,7 @@ class Renter:
 
                     db.multiple_insert("renters_group", values=[element])
                     db.insert("group_people", renter_id=renter_id, group_id=group_id, people_id=people_id)
-        raise web.seeother('/renter/' + str(renter_id) + "/", True)
+            raise web.seeother('/renter/' + str(renter_id) + "/", True)
 
 
         if form2.d.sum != None:

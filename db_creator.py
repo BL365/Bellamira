@@ -72,6 +72,7 @@ class dbCreator:
         id INT AUTO_INCREMENT,
         hall_id INT,
         days_of_week INT,
+        day_name TEXT,
         start_time INT,
         end_time INT,
         cost REAL,
