@@ -9,7 +9,7 @@ import time
 
 class Renter:
     form = web.form.Form(
-        web.form.Textbox('name', description='Название группы'), web.form.Dropdown('drop', [], description='Руководитель'),
+        web.form.Textbox('name', description='Название группы'), web.form.Dropdown('drop8', [], description='Руководитель'),
         # web.form.Checkbox('other', description='Новый?'),
         web.form.Textbox('FIO', description='ФИО нового руководителя'),
         web.form.Textbox('phone', description='Телефон'), web.form.Textbox('link', description='Ссылка в соц. сетях')
@@ -45,7 +45,7 @@ class Renter:
         cost_table = db.query('SELECT using_hall.[hall_id], using_hall.[group_id], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id] AS RENTER, rate_renter.[days_of_week] AS DAYS_IND_RATE, rate_renter.[start_time] AS ST_T_IND_RATE, rate_renter.[end_time] AS EN_T_IND_RATE, rate_renter.[cost] AS IND_COST, time_zone.[days_of_week] AS DAYS_ST_RATE, time_zone.[start_time] AS ST_T_ST_RATE, time_zone.[end_time] AS EN_T_ST_RATE, time_zone.[cost] AS STAND_COST FROM using_hall INNER JOIN renters_group ON using_hall.[group_id] = renters_group.[id] INNER JOIN rate_renter ON renters_group.[renter_id] = rate_renter.[renter_id] INNER JOIN time_zone ON using_hall.[hall_id] = time_zone.[hall_id]')
         days = db.query('SELECT * FROM days_of_week')
         form = self.form()
-        form.drop.args = getdropValues()
+        form.drop8.args = getdropValues()
         form2 = self.form2()
         form3 = self.form3()
         drop_hall = getdropValues3()
@@ -72,8 +72,7 @@ class Renter:
                 p['date'] = datetime.fromtimestamp(p['date']).strftime("%d/%m/%Y (%a) %H:%M")
                 updeted_pays.append(p)
 
-        ind_rate_sum = 0
-        rate2 = rate
+
         updated_rate = []
         for i in rate:
             # print "начало  in rate|", type(i['days_of_week']), i['days_of_week']
@@ -96,58 +95,59 @@ class Renter:
         for up in updated_rate1:
             print type(days)
             for dn in days:  # здесь номер дня недели тарифа заменяется названием. В этот цикл итератор заходит только 1 раз
-                print "начало итерации дней"
+                # print "начало итерации дней"
                 # up['days_of_week'] = str(up['days_of_week'])
                 # dn['no'] = str(dn['no'])
-                print "HEEEEREEEEEEEEE  дни перед сравнением", type(up['days_of_week']), up['days_of_week'], "|", type(dn['no']), dn['no']
+                # print "HEEEEREEEEEEEEE  дни перед сравнением", type(up['days_of_week']), up['days_of_week'], "|", type(dn['no']), dn['no']
                 if type(dn['no']) != type(up['days_of_week']):
                     dn['no'] = str(dn['no'])
-                    print "HEEEEREEEEEEEEE  после", type(up['days_of_week']), up[
-                        'days_of_week'], "|", type(dn['no']), dn['no']
+                    # print "HEEEEREEEEEEEEE  после", type(up['days_of_week']), up[
+                    #     'days_of_week'], "|", type(dn['no']), dn['no']
                 if up['days_of_week'] == dn['no']:
                     up['days_of_week'] = dn['name']
-                    updated_rate2.append(up)  # здесь, по идее, это должно изменяться
+                    updated_rate2.append(up)
 
-        if cost_table and rate2 != None:
+        ind_rate_sum = 0
+        events = db.select("using_hall", vars=locals())
+        comb_rate = db.query('SELECT rate_renter.[id], rate_renter.[renter_id], rate_renter.[hall_id], rate_renter.[days_of_week], rate_renter.[start_time], rate_renter.[end_time], rate_renter.[cost], renters_group.[renter_id], renters_group.[id] AS group_id FROM rate_renter INNER JOIN renters_group ON rate_renter.[renter_id] = renters_group.[renter_id]')
+        comb_rate = list(comb_rate)
+        if comb_rate != None:
+            events = list(events)
             delta = 0
             cost = 0
-            rent_cost = []
-            print "HEEEERREEEEEE ИТератор вошел в таблицу"
-            for c in cost_table:#этот цикл принципиально не заходит ни в if ни в for
-                c['start_time'] = datetime.fromtimestamp(c['start_time'])
-                c['end_time'] = datetime.fromtimestamp(c['end_time'])
+            # print "HEEEERREEEEEE ИТератор вошел в таблицу"
+            for c in events:#этот цикл принципиально не заходит ни в if ни в for
+                # c['start_time'] = datetime.fromtimestamp(c['start_time'])
+                # c['end_time'] = datetime.fromtimestamp(c['end_time'])
                 # print "c ReNTER", type(c['RENTER']), c['RENTER'], type(rate2), rate2
-                if c['RENTER'] == renter_id:
-                    rent_cost.append(c)
-            print "rent.cost", rent_cost
-            #     for r in rate2:
-            #         print "in rate", type(c['RENTER']), c['RENTER'], type(r['renter_id']), r['renter_id']
-            #         if c['RENTER'] == r['renter_id']:
-            #             if c['hall_id'] == r['hall_id']:#тот ли зал
-            #                 print "HEEREE совпал зал|",  c['hall_id'], "|", r['hall_id']
-            #                 r['days_of_week'] = int(r['days_of_week'])
-            #                 print "HEEEERREEEEEE день|", type(c['start_time'].weekday()), c['start_time'].weekday(), type(r['days_of_week']), r['days_of_week']
-            #                 if c['start_time'].weekday() == r['days_of_week']:#тот ли день, если тот, то сначала преобразование в один тип исчисления с тарифами
-            #                     print "HEEEERREEEEEE совпал день|"
-            #                     c['start_time'] = time.mktime(c['start_time'].timetuple())
-            #                     c['start_time'] = c['start_time'] % 86400
-            #                     c['end_time'] = time.mktime(c['end_time'].timetuple())
-            #                     c['end_time'] = c['end_time'] % 86400
-            #                     if not c['start_time'] <= r['end_time'] or c['end_time'] >= r['start_time']:
-            #                         print "HEEEERREEEEEE пересечение"
-            #                         if c['start_time'] >= r['start_time'] and c['end_time'] <= r['end_time']:# если не соблюдается - сложить все часы этого тарифа и умножить на cost, если соблюдается - искать пересекающиеся и считать
-            #                             print "HERE !!! |", a, "|искать часы"
-            #                             delta = c['end_time'] - c['start_time']
-            #                             print "HEEEERREEEEEE стоимость использованного времени тарифа|"
-            #                         elif c['start_time'] > r['start_time'] and c['end_time'] <= r['end_time']:
-            #                             delta = c['end_time'] - r['start_time']
-            #                             print "HEEEERREEEEEE стоимость задействованного времени тарифа|"
-            #                         elif c['start_time'] < r['start_time'] and c['end_time'] >= r['end_time']:
-            #                             delta = r['end_time'] - c['start_time']
-            #                             print "HEEEERREEEEEE стоимость задействованного времени тарифа|", cost
-            #                         cost = r['cost'] / 3600
-            #                         cost = delta * cost
-            #                         ind_rate_sum = ind_rate_sum + cost#здесь скопится сумма по всем задействованным индивидуальным тарифам
+                # print "в цикле", type(rate2), type(comb_rate), rate2
+                for r in comb_rate:
+                    # print "in rate", type(rate2), type(r['renter_id']), r['renter_id']
+                    if c['group_id'] == r['group_id']:
+                        if c['hall_id'] == r['hall_id']:#тот ли зал
+                            # print "HEEREE совпал зал|",  c['hall_id'], "|", r['hall_id']
+                            r['days_of_week'] = int(r['days_of_week'])
+                            # print "HEEEERREEEEEE день|", type(r['days_of_week']), r['days_of_week']
+                            if datetime.fromtimestamp(c['start_time']).weekday() == r['days_of_week']:#тот ли день, если тот, то сначала преобразование в один тип исчисления с тарифами
+                                print "HEEEERREEEEEE совпал день|"
+                                a = (c['start_time'] + 10800) % 86400
+                                b = (c['end_time'] + 10800) % 86400
+                                if not b <= r['start_time']:
+                                    if not a >= r['end_time']:
+                                        print "HEEREEE пересечение"
+                                        if a >= r['start_time'] and b <= r['end_time']:# если соблюдается - сложить все часы этого тарифа и умножить на cost, если соблюдается - искать пересекающиеся и считать
+                                            print "HERE all"
+                                            delta = r['end_time'] - r['start_time']
+                #                             print "HEEEERREEEEEE стоимость использованного времени тарифа|"
+                #                         elif c['start_time'] > r['start_time'] and c['end_time'] <= r['end_time']:
+                #                             delta = c['end_time'] - r['start_time']
+                #                             print "HEEEERREEEEEE стоимость задействованного времени тарифа|"
+                #                         elif c['start_time'] < r['start_time'] and c['end_time'] >= r['end_time']:
+                #                             delta = r['end_time'] - c['start_time']
+                #                             print "HEEEERREEEEEE стоимость задействованного времени тарифа|", cost
+                                        cost = r['cost'] / 3600
+                                        cost = delta * cost
+                                        ind_rate_sum = ind_rate_sum + cost#здесь скопится сумма по всем задействованным индивидуальным тарифам
             print "сумма за время арендованное по индивидуальным тарифам", ind_rate_sum
         print "HEEEERRREEE ИТератор перед return|"
         return render.renter(renter, renter_man, groups, people, updated_rate2, updeted_pays, uppd_ev_groups, form, form2, form3, form4)
@@ -168,25 +168,25 @@ class Renter:
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
 
 
-        if form.d.name != None:
-            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM1111111 !!!!!!!!!"
+        if form.d.name != "занятие" and form.d.drop8 != "-1" and form.d.drop8 != -1 and form.d.name != "занятие":
+            print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM1111111 !!!!!!!!!", form.d.name, form.d.drop8
             people_id = getNextId('people')
             # print "HERE!!!", type(form.d.other), form.d.other
-            print "HERE!!!", type(form.d.drop), form.d.drop
+            print "HERE!!!", type(form.d.drop8), form.d.drop8
             group_id = getNextId('renters_group')
             print form, "here form1"
-            form.d.drop = int(form.d.drop)
+            form.d.drop8 = int(form.d.drop8)
             renter_id = int(renter_id)
-            if form.d.drop != "-1":
+            if form.d.drop8 != "-1":
 
                 element = {"id": group_id,
-                           "people_id": form.d.drop,
+                           "people_id": form.d.drop8,
                            "name": form.d.name,
                            "renter_id": renter_id}
-                print "True ", type(group_id), group_id, type(people_id), people_id, type(form.d.name), form.d.name, type(renter_id), renter_id, type(form.d.drop), form.d.drop
+                print "True ", type(group_id), group_id, type(people_id), people_id, type(form.d.name), form.d.name, type(renter_id), renter_id, type(form.d.drop8), form.d.drop8
                 db.multiple_insert("renters_group", values=[element])
-                db.insert("group_people", renter_id=renter_id, group_id=group_id, people_id=form.d.drop)
-            elif form.d.drop == "-1":
+                db.insert("group_people", renter_id=renter_id, group_id=group_id, people_id=form.d.drop8)
+            elif form.d.drop8 == "-1":
                 print form.d.FIO, form.d.phone
                 if form.d.FIO != "" and form.d.phone != "":
                     element = {"FIO": form.d.FIO,

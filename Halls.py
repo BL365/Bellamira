@@ -53,10 +53,10 @@ class Hall():
         #     if c['hall_id'] == hall_id:
         #         hall_cost_table.append(c)
         event = list(event)
-        for ev in event:
-            # print "HEEEERREEEEEE в родительском цикле|", ev
-            ev['start_time'] = datetime.fromtimestamp(ev['start_time'])
-            ev['end_time'] = datetime.fromtimestamp(ev['end_time'])
+        # for ev in event:
+        #     # print "HEEEERREEEEEE в родительском цикле|", ev
+        #     ev['start_time'] = datetime.fromtimestamp(ev['start_time'])
+        #     ev['end_time'] = datetime.fromtimestamp(ev['end_time'])
 
         comb_rate = db.query('SELECT rate_renter.[id], rate_renter.[renter_id], rate_renter.[hall_id], rate_renter.[days_of_week], rate_renter.[start_time], rate_renter.[end_time], rate_renter.[cost], renters_group.[renter_id], renters_group.[id] AS group_id FROM rate_renter INNER JOIN renters_group ON rate_renter.[renter_id] = renters_group.[renter_id]')
         # print event
@@ -68,90 +68,125 @@ class Hall():
         updeted_zones1 = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
         updeted_zones1 = list(updeted_zones1)
         event_lite = []
-        # print len(zones)
-        for ev1 in event:
-            # print "родительский"
-            for r in comb_rate:
-                # print "вложенный", type(r['hall_id']), r['hall_id'], type(hall_id), hall_id
-                if r['hall_id'] == int(hall_id):
-                    # print "совпал зал"
+        while len(event)> 0:
+            ev1 = event.pop()
+            for r in (comb_rate + updeted_zones1):
+                # print "родительский"
+                if 'renter_id' in r:
                     if r['group_id'] == ev1['group_id']:
-                        print "совпали  зал и группа"
-                        if type(r['days_of_week']) != type(delta):
-                            r['days_of_week'] = int(r['days_of_week'])
-                        if ev1['start_time'].weekday() == r['days_of_week']:  # проверка дня
-                            print "совпал день"
-                            a = time.mktime(ev1['start_time'].timetuple())
-                            a = (a + 10800) % 86400 # смещение на 3 часа, необходимо, причина существования не понятна, возможно что-то с часовыми поясами
-                            b = time.mktime(ev1['end_time'].timetuple())
-                            b = (b + 10800) % 86400
-                            if not b <= r['start_time']:
-                                if not a >= r['end_time']:
-                                    print "HEEEERREEEEEE есть пересечение", a, b, r['start_time'], r['end_time'], r['cost'], r['id']
-                                    if a >= r['start_time'] and b <= r['end_time']:  # если соблюдается - сложить все часы этого тарифа и умножить на cost
-                                        print "время внутри", a, b, r['start_time'], r['end_time']
-                                        delta = b - a
-                                        event_ex.append(ev1)
-                                        print "продолжительность|добавлено в искл", delta, ev1
-                                    elif a > r['start_time']:
-                                        delta = b - r['start_time']
-                                        ev1['start_time'] = int(ev1['start_time'])
-                                        ev1['start_time'] = int(r['end_time'])
-                                        print "добавление в event_lite 1", ev1['id'], ev1['start_time'], ev1['end_time'], r['start_time'], r['end_time'], r['cost']
-                                        event_lite.append(ev1)
-                                    elif b < r['end_time']:
-                                        delta = r['end_time'] - a
-                                        print "добавление в event_lite 2", ev1['id'], ev1['start_time'], ev1['end_time'], r['start_time'], r['end_time'], r['cost']
-                                        ev1['end_time'] = int(ev1['start_time'])
-                                        ev1['end_time'] = int(r['start_time'])
-                                        event_lite.append(ev1)
-                                    cost = r['cost'] / 3600
-                                    print "cost for sec in_rate|", r['cost']
-                                    cost = r['cost'] / 3600
-                                    print "cost for sec |", r['cost']
-                                    cost = delta * cost
-                                    print "сумма", cost
-                                    ind_rate_sum = ind_rate_sum + cost  # здесь скопится сумма по всем задействованным индивидуальным тарифам
-                                    print "сумма за время арендованное по индив тарифам", ind_rate_sum
-                                    print "event_lite", event_lite
+                        # print "вложенный", type(r['hall_id']), r['hall_id'], type(hall_id), hall_id
+                        if r['hall_id'] == int(hall_id):
+                            # print "совпал зал"
+                            if r['group_id'] == ev1['group_id']:
+                                # print "совпали  зал и группа",type(r['days_of_week'])
+                                if type(r['days_of_week']) != type(delta):
+                                    r['days_of_week'] = int(r['days_of_week'])
+                                # print "ПРОВЕРКА ДНЯ!!!!!!!!!!!", ev1['name'], str(r['days_of_week'])
+                                if ev1['name'] != str(r['days_of_week']):
 
-        # for el1 in event:
+                                    if datetime.fromtimestamp(ev1['start_time']).weekday() == r['days_of_week']:  # проверка дня
+                                        print "совпал день"
+                                        a = ev1['start_time']
+                                        b = ev1['end_time']
+                                        a = (a + 10800) % 86400 # смещение на 3 часа, необходимо, причина существования не понятна, возможно что-то с часовыми поясами
+                                        b = (b + 10800) % 86400
+                                        ev1['name'] = str(r['days_of_week'])
+                                        if not b <= r['start_time']:
+                                            if not a >= r['end_time']:
+                                                print "HEEEERREEEEEE есть пересечение", a, b, r['start_time'], r['end_time'], r['cost'], r['id'], ev1['id']
+                                                if a >= r['start_time'] and b <= r['end_time']:  # если соблюдается - сложить все часы этого тарифа и умножить на cost
+                                                    print "время внутри", a, b, r['start_time'], r['end_time']
+                                                    delta = r['end_time'] - r['start_time']
+                                                    ev1['start_time'] = a
+                                                    ev1['end_time'] = r['start_time']
+                                                    event.append(ev1)
+                                                    ev1['start_time'] = r['end_time']
+                                                    ev1['end_time'] = b
+                                                    cost = r['cost'] / 3600
+                                                    cost = delta * cost
+                                                    ind_rate_sum = ind_rate_sum + cost
+                                                    print "сумма", cost, "|delta|", delta
+                                                    print "сумма за время арендованное по индив тарифам", ind_rate_sum
+                                                    event.append(ev1)
+                            #                         print "продолжительность|добавлено в искл", delta
+                                                elif a >= r['start_time']:
+                                                    delta = r['end_time'] - a
+                                                    a = int(r['end_time'])
+                                                    ev1['start_time'] = a
+                                                    ev1['end_time'] = b
+                                                    print "добавление в event_lite 1|", ev1['id'], ev1['start_time'], ev1['end_time'], r['start_time'], r['end_time'], r['cost'], delta, a, b
+                                                    cost = r['cost'] / 3600
+                                                    cost = delta * cost
+                                                    ind_rate_sum = ind_rate_sum + cost
+                                                    print "сумма", cost, "|delta|", delta
+                                                    print "сумма за время арендованное по индив тарифам", ind_rate_sum
+                                                    event.append(ev1)
+                                                elif b <= r['end_time']:
+                                                    delta = b - r['start_time']
+                                                    ev1['start_time'] = a
+                                                    ev1['end_time'] = b
+                                                    print "добавление в event_lite 2|", ev1['id'], ev1['start_time'], ev1['end_time'], r['start_time'], r['end_time'], r['cost'], delta
+
+                                                    ev1['end_time'] = int(r['start_time'])
+                                                    event.append(ev1)
+
+                                                    cost = r['cost'] / 3600
+                                                    print "cost for ind_rate|", r['cost']
+                                                    cost = delta * cost
+
+                                                    ind_rate_sum = ind_rate_sum + cost  # здесь скопится сумма по всем задействованным индивидуальным тарифам
+                                                    print "сумма", cost, "|delta|", delta
+                                                    print "сумма за время арендованное по индив тарифам", ind_rate_sum
+
+                                elif ev1['name'] == str(r['days_of_week']):
+                                    # print "ДЕНЬ  !!!!!!!! СОВПАЛ"
+                                    if not ev1['end_time'] <= r['start_time']:
+                                        if not ev1['start_time'] >= r['end_time']:
+                                            print "пересечение В ОБРЕЗКАХ", ev1['start_time'], ev1['end_time'], r['start_time'], r['end_time'], r['cost'], r['id'], ev1['id']
+                                            if ev1['start_time'] >= r['start_time'] and ev1['end_time'] <= r[
+                                                'end_time']:  # если соблюдается - сложить все часы этого тарифа и умножить на cost
+                                                print "время внутри", ev1['start_time'], ev1['end_time'], r['start_time'], r['end_time']
+                                                delta = r['end_time'] - r['start_time']
+                                                ev1['end_time'] = r['start_time']
+                                                event.append(ev1)
+                                                ev1['start_time'] = r['end_time']
+                                                cost = r['cost'] / 3600
+                                                cost = delta * cost
+                                                ind_rate_sum = ind_rate_sum + cost
+                                                print "сумма", cost, "|delta|", delta
+                                                print "сумма за время арендованное по индив тарифам", ind_rate_sum
+                                                event.append(ev1)
+                                                #                         print "продолжительность|добавлено в искл", delta
+                                            elif ev1['start_time'] >= r['start_time']:
+                                                delta = r['end_time'] - ev1['start_time']
+                                                ev1['end_time'] = ev1['end_time']
+                                                print "добавление в event_lite 111|", ev1['id'], ev1[
+                                                    'start_time'], ev1['end_time'], r['start_time'], r[
+                                                    'end_time'], r['cost'], delta
+                                                cost = r['cost'] / 3600
+                                                cost = delta * cost
+                                                ind_rate_sum = ind_rate_sum + cost
+                                                print "сумма", cost, "|delta|", delta
+                                                print "сумма за время арендованное по ВТОРИЧНЫМ индив тарифам", ind_rate_sum
+                                                event.append(ev1)
+                                            elif ev1['end_time'] <= r['end_time']:
+                                                delta = ev1['start_time'] - r['start_time']
+                                                print "добавление в event_lite 222|", ev1['id'], ev1['start_time'], ev1['end_time'], r['start_time'], r[
+                                                    'end_time'], r['cost'], delta
+                                                ev1['end_time'] = int(r['start_time'])
+                                                event.append(ev1)
+
+                                                print "cost for ind_rate|", r['cost']
+                                                cost = r['cost'] / 3600
+                                                cost = delta * cost
+                                                ind_rate_sum = ind_rate_sum + cost
+                                                print "сумма", cost, "|delta|", delta
+                                                print "сумма за время арендованное по ВТОРИЧНЫМ индив тарифам", ind_rate_sum
+                                              # здесь скопится сумма по всем задействованным индивидуальным тарифам
+        print "сумма за время арендованное по ВТОРИЧНЫМ индив тарифам", ind_rate_sum
 
 
-        for el in event_lite:
-            for zo in updeted_zones1:
-                # print "HEEEERREEEEEE во вложенном цикле1|", type(ev1['start_time']), ev1['start_time'], type(zo['days_of_week']), zo['days_of_week']
-                if type(zo['days_of_week']) != type(delta):
-                    zo['days_of_week'] = int(zo['days_of_week'])
-                # print "HEEEERREEEEEE во вложенном цикле2|", type(ev1['start_time']), ev1['start_time'], type(zo['days_of_week']), zo['days_of_week'], ev1['id']
 
-                if el['start_time'].weekday() == zo['days_of_week']: #проверка дня
-                    a = time.mktime(el['start_time'].timetuple())
-                    a = (a + 10800) % 86400# смещение на 3 часа, необходимо, причина существования не понятна, возможно что-то с часовыми поясами
-                    b = time.mktime(el['end_time'].timetuple())
-                    b = (b + 10800) % 86400
-                    if not b <= zo['start_time']:# проверка пересечения с общим тарифом
-                        if not a >= zo['end_time']:# проверка пересечения с общим тарифом
-                            print "HEEEERREEEEEE пересечение с общим тарифом", a, b, zo['start_time'], zo['end_time'], zo['cost'], zo['id']
-
-                            if a >= zo['start_time'] and b <= zo['end_time']:# если соблюдается - сложить все часы этого тарифа и умножить на cost
-                                print "время внутри тарифа", a, b, zo['start_time'], zo['end_time']
-                                delta = b - a
-                                print "HEEEERREEEEEE продолжительность занятия|", delta
-                            elif a > zo['start_time'] and b <= zo['end_time']:
-                                delta = b - zo['start_time']
-                                print "HEEEERREEEEEE стоимость задействованного времени (выступ справа)", delta, a, b, zo['start_time'], zo['end_time'], zo['cost']
-
-                            elif a < zo['start_time'] and b >= zo['end_time']:
-                                delta = zo['end_time'] - a
-                                print "HEEEERREEEEEE стоимость задействованного времени (выступ слева)", delta, zo[
-                                    'start_time'], zo['end_time'], zo['cost']
-                                cost = zo['cost'] / 3600
-                            print "cost", zo['cost']
-                            cost = delta * cost
-                            print "сумма", cost
-                            rate_sum = rate_sum + cost#здесь скопится сумма по всем задействованным индивидуальным тарифам
-                            print "сумма за время арендованное по общим тарифам", rate_sum
 
         updeted_events = []
         for e in events:
@@ -162,7 +197,7 @@ class Hall():
                     e['group_id'] = t[1]
                     updeted_events.append(e)
 
-        return render.prices(hall, updeted_zones, form, form2, updeted_events)
+        return render.prices(hall, updeted_zones, form, form2, updeted_events, ind_rate_sum)
 
     def POST(self, hall_id):
         form = self.form()
@@ -196,7 +231,7 @@ class Hall():
                 db.multiple_insert('time_zone', values=[element])
             raise web.seeother('/hall/' + str(hall_id) + "/", True)
 
-        if form2.d.startTime and form2.d.endTime != None:
+        if form2.d.start_time and form2.d.end_time != None:
             if form2.d.drop != "-1":
                 start_dt_string2 = datetime.strptime(form2.d.start_time, "%d/%m/%Y %H:%M")
                 start_dt_unix2 = time.mktime(start_dt_string2.timetuple())
