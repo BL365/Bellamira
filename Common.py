@@ -25,10 +25,10 @@ urls = (
     '/delrenter/(\\d+)?', 'DelRenter',
     '/home/', 'Home',
     '/deleteEventFromHall/(\\d+)/(\\d+)?', 'DelEvent',
-    '/delpay/(\\d+)/(\\d+)?/', 'DelPay',
-    '/delindrate/(\\d+)/(\\d+)?/', 'DelIndRate',
+    '/delpay/(\\d+)/(\\d+)?', 'DelPay',
+    '/delindrate/(\\d+)/(\\d+)?', 'DelIndRate',
     '/delgroup/(\\d+)/(\\d+)?', 'DelGroup',
-    '/delpeople/(\\d+)/(\\d+)/?', 'DelGroup'
+    '/delpeople/(\\d+)/(\\d+)?', 'DelGroup'
 
 )
 
