@@ -1,4 +1,4 @@
-$def with (hall, time_zones, form, form2, updeted_events, ind_rate_sum)
+$def with (hall, time_zones, form, form2, updeted_events, ind_rate_sum, pub_sum, sum)
 <script type="text/javascript" src="/static/jquery.js"></script>
 <script type="text/javascript" src="/static/prices_script.js"></script>
 <h2>$hall.name</h2>
@@ -51,7 +51,10 @@ $def with (hall, time_zones, form, form2, updeted_events, ind_rate_sum)
 
 
 <div class="formT">
-<h4>Общая выручка по залу составляет $ind_rate_sum руб</h4>
+    <h4>По индивидуальным тарифам выручка составляет $pub_sum руб</h4>
+    <h4>По общим тарифам выручка составляет $ind_rate_sum руб</h4>
+    <h4>Общая выручка по залу составляет $sum руб</h4>
+
 </div>
 
 

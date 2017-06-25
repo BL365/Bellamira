@@ -14,12 +14,7 @@ class Home:
         form = self.form
 
         reg = 0
-        people = db.query('Select * from people')
-        for p in people:
-            if form.d.log == p['login']:
-                if form.d.pas == p['password']:
-                    print "AUTH!!!!!!!!"
-                    reg = 1
+
 
 
         return render.Home(form, reg)
@@ -30,9 +25,13 @@ class Home:
         form = self.form()
         if not form.validates():
             raise web.seeother('/home/', True)
+        people = db.query('Select * from people')
+        for p in people:
+            if form.d.log == p['login']:
+                if form.d.pas == p['password']:
+                    print "AUTH!"
 
-
-        raise web.seeother('/home/', True)
+                    raise web.seeother('/renters/', True)
 #
 #
 #
