@@ -41,11 +41,12 @@ $def with (form, reg)
                 <input type="submit" value="Я - администратор">
                 </form></div>
             $else:
-                <form action="/home/login" method="post">
-                      <input type="submit" value="выход">
-                </form>
-                    <h3><a href="/renters/">К списку арендаторов</a></h3>
+                    <div class="ad">
                     <h3><a href="/halls/">К списку залов</a></h3>
+                    <h3><a href="/renters/">К списку арендаторов</a></h3>
+                    <form action="/home/login" method="post">
+                      <input type="submit" value="выход">
+                    </form></div>
         </td>
     </tr>
     <tr>

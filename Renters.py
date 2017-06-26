@@ -362,7 +362,7 @@ class Renter:
         #         updated_rate3.append(s)
         #     if s['days_of_week'] == "Вс":
         #         updated_rate3.append(s)
-        balance = float(ind_rate_sum) - float(sum_pays)
+        balance = sum_pays - ind_rate_sum
         return render.renter(renter, renter_man, groups, people, updated_rate2, updeted_pays, uppd_ev_groups, form, form2, form3, form4, ind_rate_sum, sum_pays, balance)
 
     def POST(self, renter_id):
