@@ -2,6 +2,7 @@
 
 from Common import *
 
+isAuthSuccess = False
 
 class Home:
 
@@ -12,27 +13,25 @@ class Home:
 
     def GET(self):
         form = self.form
-
-        reg = 0
-
-
-
-        return render.Home(form, reg)
+        return render.Home(form, isAuthSuccess)
 
 
     def POST(self):
-
+        global isAuthSuccess
+        print "post enter"
         form = self.form()
-        if not form.validates():
+        if not form.validates() or not form.d.log:
+            isAuthSuccess = False
             raise web.seeother('/home/', True)
-        people = db.query('Select * from people')
-        for p in people:
-            if form.d.log == p['login']:
-                if form.d.pas == p['password']:
-                    print "AUTH!"
+        auth = db.query('Select * from auth where login ="' + form.d.log+'"')
+        auth = list(auth)
+        print len(auth), auth
+        for a in auth:
+            if form.d.pas == a['password']:
+                print "AUTH!"
+                isAuthSuccess = True
 
-                    raise web.seeother('/renters/', True)
-#
+                raise web.seeother('/home/', True)
 #
 #
         # $s = file_get_contents('http://ulogin.ru/token.php?token='. $_POST['token'].
@@ -48,4 +47,5 @@ class Home:
 # #         s = ('http://ulogin.ru/token.php?token=', _POST['token'], '&host=', _SERVER['HTTP_HOST'])
 # #
 # #
-# #
+# #        все заливай и обновляем на сервере
+

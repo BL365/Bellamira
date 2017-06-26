@@ -121,6 +121,14 @@ class dbCreator:
         primary key (id)
     )"""
 
+    createTableAuth = """CREATE TABLE IF NOT EXISTS auth (
+            id INT AUTO_INCREMENT,
+            login TEXT,
+            password TEXT,
+            primary key (login)
+        )"""
+
+    insertAdmin = """ INSERT OR REPLACE INTO auth VALUES (1,'admin', 'admin')"""
 
     def execute(self):
         conn = sqlite3.connect(self.dbName)
@@ -138,7 +146,8 @@ class dbCreator:
             conn.execute(self.createTablePaysSQL)
             conn.execute(self.createTableRateRenter)
             conn.execute(self.createTableDays)
-
+            conn.execute(self.createTableAuth)
+            conn.execute(self.insertAdmin)
         except OperationalError, msg:
             print msg
         conn.close()

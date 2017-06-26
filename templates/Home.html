@@ -33,15 +33,19 @@ $def with (form, reg)
             <h1><a href="https://vk.com/bellamira">Свяжитесь с нами!</a></h1>
         </td>
         <td align="right" height="5%">
-            <div class="form0">
-            <!--<h4>Авторизуйтесь!</h4>-->
-            <form action="/home/" method="post">
+            $if (not reg):
+                <div class="form0">
+                <!--<h4>Авторизуйтесь!</h4>-->
+                <form action="/home/login" method="post">
                 $:form.render()
-            <input type="submit" value="Я - администратор">
-        </form></div>
-            <br>
-                <a href="/renters/">К списку арендаторов</a>
-                <a href="/halls/">К списку залов</a>
+                <input type="submit" value="Я - администратор">
+                </form></div>
+            $else:
+                <form action="/home/login" method="post">
+                      <input type="submit" value="выход">
+                </form>
+                    <a href="/renters/">К списку арендаторов</a>
+                    <a href="/halls/">К списку залов</a>
         </td>
     </tr>
     <tr>

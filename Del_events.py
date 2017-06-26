@@ -4,9 +4,9 @@ from Common import *
 
 class DelEvent():
 
-    def GET(self, hall_id, event_id):
+    def GET(self, renter_id, event_id):
         db.delete('using_hall', where='id=$event_id', vars=locals())
-        raise web.seeother('/hall/' + str(hall_id) + "/", True)
+        raise web.seeother('/renter/' + str(renter_id) + "/", True)
 
 
 class DelPay():
