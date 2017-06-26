@@ -64,11 +64,12 @@ class Renter:
                 if e['renter'] == int(renter_id):
                     uppd_ev_groups.append(e)
             print "HERREEE ИТератор прошел цикл|"
-
+        sum_pays = 0.0
         if pays != None:
             updeted_pays = []
             print "HEEEERREEEEEE ИТератор перед pays|"
             for p in pays:
+                sum_pays = sum_pays + float(p['sum'])
                 p['date'] = datetime.fromtimestamp(p['date']).strftime("%d/%m/%Y (%a) %H:%M")
                 updeted_pays.append(p)
 
@@ -107,51 +108,50 @@ class Renter:
                     up['days_of_week'] = dn['name']
                     updated_rate2.append(up)
 
+        event_lite = []
         ind_rate_sum = 0
         events = db.query('SELECT using_hall.[id], using_hall.[group_id], using_hall.[hall_id], using_hall.[name], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id], renters_group.[id] AS group_id FROM using_hall INNER JOIN renters_group ON using_hall.[group_id] = renters_group.[id]')
         comb_rate = db.query('SELECT rate_renter.[id], rate_renter.[renter_id], rate_renter.[hall_id], rate_renter.[days_of_week], rate_renter.[start_time], rate_renter.[end_time], rate_renter.[cost], renters_group.[renter_id], renters_group.[id] AS group_id FROM rate_renter INNER JOIN renters_group ON rate_renter.[renter_id] = renters_group.[renter_id]')
         comb_rate = list(comb_rate)
         if comb_rate != None:
             events = list(events)
+
+            ###################################################
+            #это фикс озвучнной тобой проблемы
+            for e in events:
+                e['orig_start_time'] = e['start_time']
+            ###################################################
+
+
             delta = 0
             cost = 0
             while len(events) > 0:
                 c = events.pop()
-                # c['start_time'] = datetime.fromtimestamp(c['start_time'])
-                # c['end_time'] = datetime.fromtimestamp(c['end_time'])
-                # print "c ReNTER", type(c['RENTER']), c['RENTER'], type(rate2), rate2
-                # print "в цикле", type(rate2), type(comb_rate), rate2
                 for r in comb_rate:
-                    # print "in rate", type(c['renter_id']), type(renter_id)
                     if c['renter_id'] == int(renter_id) and c['renter_id'] == r['renter_id']:
-                        # print "совпал арендатор", c['renter_id'], int(renter_id), r['renter_id']
                         if c['group_id'] == r['group_id']:
                             if c['hall_id'] == r['hall_id']:#тот ли зал
-                                # print "HEEREE совпал зал|",  c['hall_id'], "|", r['hall_id']
                                 r['days_of_week'] = int(r['days_of_week'])
-                                # print "HEEEERREEEEEE день|", type(r['days_of_week']), r['days_of_week']
                                 if c['name'] != str(r['days_of_week']):
-                                    if datetime.fromtimestamp(c['start_time']).weekday() == r['days_of_week']:#тот ли день, если тот, то сначала преобразование в один тип исчисления с тарифами
-                                        # print "HEEEERREEEEEE совпали группа, зал, день|", r['id'], c['id'], c['group_id'], r['group_id'], c['hall_id'], r['hall_id']
-                                        # print "!", r['days_of_week'], r['days_of_week']
+                                    if datetime.fromtimestamp(c['start_time']).weekday() == r['days_of_week']:
                                         a = (c['start_time'] + 10800) % 86400
                                         b = (c['end_time'] + 10800) % 86400
-                                        print "DAY!!!!!!",  r['days_of_week'], datetime.fromtimestamp(c['start_time']).weekday()
-                                        c['name'] = str(datetime.fromtimestamp(c['start_time']).weekday())
+                                        # print "DAY!!!!!!",  r['days_of_week'], datetime.fromtimestamp(c['start_time']).weekday()
+                                        c['name'] = str(datetime.fromtimestamp(c['orig_start_time']).weekday())
                                         if not b <= r['start_time']:
                                             if not a >= r['end_time']:
-                                                print "HEEREEE пересечение", a, b, r['start_time'], r['end_time'], r['cost'], r['id'], c['id']
+                                                # print "HEEREEE пересечение", a, b, r['start_time'], r['end_time'], r['cost'], r['id'], c['id']
                                                 if a >= r['start_time'] and b <= r['end_time']:# если соблюдается - сложить все часы этого тарифа и умножить на cost, если соблюдается - искать пересекающиеся и считать
-                                                    print "HERE all in", a, b, r['start_time'], r['end_time'], r['id'], c['id'], ":id|days:", str(r['days_of_week']), datetime.fromtimestamp(c['start_time']).weekday()
+                                                    # print "HERE all in", a, b, r['start_time'], r['end_time'], r['id'], c['id'], ":id|days:", str(r['days_of_week']), datetime.fromtimestamp(c['start_time']).weekday()
                                                     delta = c['end_time'] - c['start_time']
-                                                    print "сумма|", r['cost'], "delta|", delta
+                                                    # print "сумма|", r['cost'], "delta|", delta
                         #                             print "HEEEERREEEEEE стоимость использованного времени тарифа|"
 
                                                 elif a < r['start_time'] and b > r['end_time']:
-                                                    print "HERE where big", a, b, r['start_time'], r['end_time'], r['id'], c[
-                                                        'id']
+                                                    # print "HERE where big", a, b, r['start_time'], r['end_time'], r['id'], c[
+                                                    #     'id']
                                                     delta = r['end_time'] - r['start_time']
-                                                    print "сумма|", r['cost'], "delta|", delta
+                                                    # print "сумма|", r['cost'], "delta|", delta
                                                     c['start_time'] = a
                                                     c['end_time'] = r['start_time']
                                                     events.append(c)
@@ -160,77 +160,190 @@ class Renter:
                                                     events.append(c)
 
                                                 elif a >= r['start_time']:
-                                                    print "HERE старт занятия в тарифе", a, b, r['start_time'], r['end_time'], r['id'], c['id']
+                                                    # print "HERE старт занятия в тарифе", a, b, r['start_time'], r['end_time'], r['id'], c['id']
                                                     delta = r['end_time'] - a
                                                     a = int(r['end_time'])
                                                     c['start_time'] = r['end_time']
                                                     c['end_time'] = b
                                                     events.append(c)
-                                                    print "HERE доб-е обрезка", c['start_time'], c['end_time']
-                                                    print "сумма|", r['cost'], "delta|", delta
+                                                    # print "HERE доб-е обрезка", c['start_time'], c['end_time']
+                                                    # print "сумма|", r['cost'], "delta|", delta
                                                 elif b <= r['end_time']:
                                                     delta = b - r['start_time']
-                                                    print "HERE end занятия в тарифе", a, b, r['start_time'], r['end_time'], r['id'], c['id']
-                                                    print "сумма|", r['cost'], "delta|", delta
+                                                    # print "HERE end занятия в тарифе", a, b, r['start_time'], r['end_time'], r['id'], c['id']
+                                                    # print "сумма|", r['cost'], "delta|", delta
                                                     c['end_time'] = r['start_time']
                                                     c['start_time'] = a
                                                     events.append(c)
-                                                    print "HERE доб-е обрезка", c['start_time'], c['end_time']
-                                                    print "сумма|", r['cost'], "delta|", delta
+                                                    # print "HERE доб-е обрезка", c['start_time'], c['end_time']
+                                                    # print "сумма|", r['cost'], "delta|", delta
                                                 cost = r['cost'] / 3600
                                                 cost = delta * cost
-                                                print "сумма", cost, "|delta|", delta
+                                                # print "сумма", cost, "|delta|", delta
                                                 ind_rate_sum = ind_rate_sum + cost#здесь скопится сумма по всем задействованным индивидуальным тарифам
-                                                print "сумма за время арендованное по индивидуальным тарифам", ind_rate_sum
+                                                # print "сумма за время арендованное по индивидуальным тарифам", ind_rate_sum
+                                            event_lite.append(c)
+                                        event_lite.append(c)
                                 elif c['name'] == str(r['days_of_week']):
-                                    print "day 111111111111111111111111", c['name'],  str(r['days_of_week'])
+                                    # print "day 111111111111111111111111", c['name'],  str(r['days_of_week'])
                                     if not c['end_time'] <= r['start_time']:
                                         if not c['start_time'] >= r['end_time']:
-                                            print "HEEREEE пересечение", c['start_time'], c['end_time'], r['start_time'], r['end_time'], r[
-                                                'cost'], r['id'], c['id']
-                                            if c['start_time'] >= r['start_time'] and c['end_time'] <= r[
-                                                'end_time']:  # если соблюдается - сложить все часы этого тарифа и умножить на cost, если соблюдается - искать пересекающиеся и считать
-                                                print "HERE all in обр", c['start_time'], c['end_time'], r['start_time'], r['end_time'], r['id'], c['id'], ":id|days:", str(r['days_of_week']), c['name']
+                                            # print "HEEREEE пересечение", c['start_time'], c['end_time'], r['start_time'], r['end_time'], r[
+                                            #     'cost'], r['id'], c['id']
+                                            if c['start_time'] >= r['start_time'] and c['end_time'] <= r['end_time']:  # если соблюдается - сложить все часы этого тарифа и умножить на cost, если соблюдается - искать пересекающиеся и считать
+                                                # print "HERE all in обр", c['start_time'], c['end_time'], r['start_time'], r['end_time'], r['id'], c['id'], ":id|days:", str(r['days_of_week']), c['name']
                                                 delta = c['end_time'] - c['start_time']
-                                                print "сумма|", r['cost'], "delta|", delta
-                                                #                             print "HEEEERREEEEEE стоимость использованного времени тарифа|"
-
+                                                # print "сумма|", r['cost'], "delta|", delta
                                             elif c['start_time'] < r['start_time'] and c['end_time'] > r['end_time']:
-                                                print "HERE where big", c['start_time'], c['end_time'], r['start_time'], r['end_time'], r['id'], c['id']
+                                                # print "HERE where big", c['start_time'], c['end_time'], r['start_time'], r['end_time'], r['id'], c['id']
                                                 delta = r['end_time'] - r['start_time']
-                                                print "сумма|", r['cost'], "delta|", delta
-
+                                                # print "сумма|", r['cost'], "delta|", delta
                                                 c['end_time'] = r['start_time']
                                                 events.append(c)
                                                 c['start_time'] = r['end_time']
-
                                                 events.append(c)
-
                                             elif c['start_time'] >= r['start_time']:
-                                                print "HERE старт занятия в тарифе", c['start_time'], c['end_time'], r['start_time'], r[
-                                                    'end_time'], r['id'], c['id']
+                                                # print "HERE старт занятия в тарифе", c['start_time'], c['end_time'], r['start_time'], r[
+                                                #     'end_time'], r['id'], c['id']
                                                 delta = r['end_time'] - c['start_time']
                                                 c['start_time'] = int(r['end_time'])
-
-
                                                 events.append(c)
-                                                print "HERE доб-е обрезка", c['start_time'], c['end_time']
-                                                print "сумма|", r['cost'], "delta|", delta
+                                                # print "HERE доб-е обрезка", c['start_time'], c['end_time']
+                                                # print "сумма|", r['cost'], "delta|", delta
                                             elif c['end_time'] <= r['end_time']:
                                                 delta = c['end_time'] - r['start_time']
-                                                print "HERE end занятия в тарифе", c['start_time'], c['end_time'], r['start_time'], r['end_time'], \
-                                                r['id'], c['id']
-                                                print "сумма|", r['cost'], "delta|", delta
+                                                # print "HERE end занятия в тарифе", c['start_time'], c['end_time'], r['start_time'], r['end_time'], \
+                                                # r['id'], c['id']
+                                                # print "сумма|", r['cost'], "delta|", delta
                                                 c['end_time'] = r['start_time']
-
                                                 events.append(c)
-                                                print "HERE доб-е обрезка", c['start_time'], c['end_time']
-                                                print "сумма|", r['cost'], "delta|", delta
+                                                # print "HERE доб-е обрезка", c['start_time'], c['end_time']
+                                                # print "сумма|", r['cost'], "delta|", delta
                                             cost = r['cost'] / 3600
                                             cost = delta * cost
-                                            print "сумма", cost, "|delta|", delta
+                                            # print "сумма", cost, "|delta|", delta
                                             ind_rate_sum = ind_rate_sum + cost  # здесь скопится сумма по всем задействованным индивидуальным тарифам
                                             print "сумма за время арендованное по индивидуальным тарифам c обрезками", ind_rate_sum
+                                        event_lite.append(c)
+                                    event_lite.append(c)
+        zones = db.select('time_zone', vars=locals())
+        rate_sum = 0
+        zones = list(zones)
+        while len(event_lite) > 0:
+            c1 = event_lite.pop()
+            for c1 in events:
+                c1['orig_start_time'] = c1['start_time']
+
+            for r1 in zones:
+                if c1['hall_id'] == r1['hall_id']:  # тот ли зал
+                    r1['days_of_week'] = int(r1['days_of_week'])
+                    if c1['name'] != str(r1['days_of_week']):
+                        if datetime.fromtimestamp(c1['start_time']).weekday() == r1['days_of_week']:
+                            a = (c1['start_time'] + 10800) % 86400
+                            b = (c1['end_time'] + 10800) % 86400
+                            # print "DAY!!!!!!", r1['days_of_week'], datetime.fromtimestamp(c1['start_time']).weekday()
+                            c1['name'] = str(datetime.fromtimestamp(c1['orig_start_time']).weekday())
+                            if not b <= r1['start_time']:
+                                if not a >= r1['end_time']:
+                                    print "HEEREEE пересечение", a, b, r1['start_time'], r1['end_time'], r1['cost'], r1[
+                                        'id'], c1['id']
+                                    if a >= r1['start_time'] and b <= r1[
+                                        'end_time']:  # если соблюдается - сложить все часы этого тарифа и умножить на cost, если соблюдается - искать пересекающиеся и считать
+                                        print "HERE all in", a, b, r1['start_time'], r1['end_time'], r1['id'], c1[
+                                            'id'], ":id|days:", str(r1['days_of_week']), datetime.fromtimestamp(
+                                            c1['start_time']).weekday()
+                                        delta = c1['end_time'] - c1['start_time']
+                                        print "сумма|", r1['cost'], "delta|", delta
+                                        #                             print "HEEEERREEEEEE стоимость использованного времени тарифа|"
+
+                                    elif a < r1['start_time'] and b > r1['end_time']:
+                                        print "HERE where big", a, b, r1['start_time'], r1['end_time'], r1['id'], c1[
+                                            'id']
+                                        delta = r1['end_time'] - r1['start_time']
+                                        print "сумма|", r1['cost'], "delta|", delta
+                                        c1['start_time'] = a
+                                        c1['end_time'] = r1['start_time']
+                                        events.append(c1)
+                                        c1['start_time'] = r1['end_time']
+                                        c1['end_time'] = b
+                                        events.append(c1)
+
+                                    elif a >= r1['start_time']:
+                                        print "HERE старт занятия в тарифе", a, b, r1['start_time'], r1['end_time'], r1[
+                                            'id'], c1['id']
+                                        delta = r1['end_time'] - a
+                                        a = int(r1['end_time'])
+                                        c1['start_time'] = r1['end_time']
+                                        c1['end_time'] = b
+                                        events.append(c1)
+                                        print "HERE доб-е обрезка", c1['start_time'], c1['end_time']
+                                        print "сумма|", r1['cost'], "delta|", delta
+                                    elif b <= r1['end_time']:
+                                        delta = b - r1['start_time']
+                                        print "HERE end занятия в тарифе", a, b, r1['start_time'], r1['end_time'], r1[
+                                            'id'], c1['id']
+                                        print "сумма|", r1['cost'], "delta|", delta
+                                        c1['end_time'] = r1['start_time']
+                                        c1['start_time'] = a
+                                        events.append(c1)
+                                        print "HERE доб-е обрезка", c1['start_time'], c1['end_time']
+                                        print "сумма|", r1['cost'], "delta|", delta
+                                    cost = r1['cost'] / 3600
+                                    cost = delta * cost
+                                    print "сумма", cost, "|delta|", delta
+                                    rate_sum = rate_sum + cost  # здесь скопится сумма по всем задействованным индивидуальным тарифам
+                                    print "сумма за время арендованное по общим тарифам", rate_sum
+
+                    elif c1['name'] == str(r1['days_of_week']):
+                        # print "day 111111111111111111111111", c1['name'], str(r1['days_of_week'])
+                        if not c1['end_time'] <= r1['start_time']:
+                            if not c1['start_time'] >= r1['end_time']:
+                                print "HEEREEE пересечение", c1['start_time'], c1['end_time'], r1['start_time'], r1[
+                                    'end_time'], r1[
+                                    'cost'], r1['id'], c1['id']
+                                if c1['start_time'] >= r1['start_time'] and c1['end_time'] <= r1[
+                                    'end_time']:  # если соблюдается - сложить все часы этого тарифа и умножить на cost, если соблюдается - искать пересекающиеся и считать
+                                    print "HERE all in обр", c1['start_time'], c1['end_time'], r1['start_time'], r1[
+                                        'end_time'], r1['id'], c1['id'], ":id|days:", str(r1['days_of_week']), c1['name']
+                                    delta = c1['end_time'] - c1['start_time']
+                                    print "сумма|", r1['cost'], "delta|", delta
+                                elif c1['start_time'] < r1['start_time'] and c1['end_time'] > r1['end_time']:
+                                    print "HERE where big", c1['start_time'], c1['end_time'], r1['start_time'], r1[
+                                        'end_time'], r1['id'], c1['id']
+                                    delta = r1['end_time'] - r1['start_time']
+                                    print "сумма|", r1['cost'], "delta|", delta
+                                    c1['end_time'] = r1['start_time']
+                                    events.append(c1)
+                                    c1['start_time'] = r1['end_time']
+                                    events.append(c1)
+                                elif c1['start_time'] >= r1['start_time']:
+                                    print "HERE старт занятия в тарифе", c1['start_time'], c1['end_time'], r1[
+                                        'start_time'], r1[
+                                        'end_time'], r1['id'], c1['id']
+                                    delta = r1['end_time'] - c1['start_time']
+                                    c1['start_time'] = int(r1['end_time'])
+                                    events.append(c1)
+                                    print "HERE доб-е обрезка", c1['start_time'], c1['end_time']
+                                    print "сумма|", r1['cost'], "delta|", delta
+                                elif c1['end_time'] <= r1['end_time']:
+                                    delta = c1['end_time'] - r1['start_time']
+                                    print "HERE end занятия в тарифе", c1['start_time'], c1['end_time'], r1['start_time'], \
+                                    r1['end_time'], \
+                                        r1['id'], c1['id']
+                                    print "сумма|", r1['cost'], "delta|", delta
+                                    c1['end_time'] = r1['start_time']
+                                    events.append(c1)
+                                    print "HERE доб-е обрезка", c1['start_time'], c1['end_time']
+                                    print "сумма|", r1['cost'], "delta|", delta
+                                cost = r1['cost'] / 3600
+                                cost = delta * cost
+                                print "сумма", cost, "|delta|", delta
+                                rate_sum = rate_sum + cost  # здесь скопится сумма по всем задействованным индивидуальным тарифам
+                                print "сумма за время арендованное по общим тарифам c обрезками", rate_sum
+
+
+
+
 
         print "HEEEERRREEE ИТератор перед return|"
         # updated_rate3 = []
@@ -249,7 +362,8 @@ class Renter:
         #         updated_rate3.append(s)
         #     if s['days_of_week'] == "Вс":
         #         updated_rate3.append(s)
-        return render.renter(renter, renter_man, groups, people, updated_rate2, updeted_pays, uppd_ev_groups, form, form2, form3, form4)
+        balance = float(ind_rate_sum) - float(sum_pays)
+        return render.renter(renter, renter_man, groups, people, updated_rate2, updeted_pays, uppd_ev_groups, form, form2, form3, form4, ind_rate_sum, sum_pays, balance)
 
     def POST(self, renter_id):
         print "ИТЕРАТОР В КЛАССЕ РЕНТЕР _ ПОСТ   "
