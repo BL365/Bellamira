@@ -68,65 +68,66 @@ class Hall():
         updeted_zones1 = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
         updeted_zones1 = list(updeted_zones1)
         event_lite = []
-        while len(event)> 0: #проверка остались ли занятия в списке
-            ev1 = event.pop() #изъятие последнего элемента списка
-            for r in comb_rate:
-                if r['group_id'] == ev1['group_id']:
-                    if r['hall_id'] == int(hall_id):
-                        # print "совпали  зал и группа",type(r['days_of_week'])
-                        # print "ПРОВЕРКА ДНЯ", "nm_day_ev", datetime.fromtimestamp(ev1['start_time']).weekday(), "nm_day_r", r['days_of_week'], "__", r['id'], ev1['id']
-                        # if ev1['name'] != str(r['days_of_week']):
-                        if int(r['days_of_week']) == datetime.fromtimestamp(ev1['start_time']).weekday():  # проверка дня
-                            # print "совпал день", r['days_of_week'], datetime.fromtimestamp(ev1['start_time']).weekday(), "_",  r['id'], ev1['id']
-                            a = ev1['start_time']
-                            b = ev1['end_time']
-                            a = (a + 10800) % 86400 # смещение на 3 часа, необходимо, причина существования не ясна, возможно что-то с часовыми поясами                                                    #
-                            b = (b + 10800) % 86400
-                            ev1['name'] = str(r['days_of_week'])
-                            if not b <= r['start_time'] and not a >= r['end_time']:
-                                # print "есть пересечение !", a, b, r['start_time'], r['end_time'], r['cost'], r['id'], ev1['id']
-                                if a >= r['start_time'] and b <= r['end_time']:  # если соблюдается - сложить
-                                    cost = delta(ev1['end_time'], ev1['start_time'], r['cost'])
-                                    # print type(a), type(b), r['start_time'], r['end_time'], ev1['start_time'], ev1['end_time'], r['cost'], "!1"
-                                elif a < r['start_time'] and b > r['end_time']:
-                                    cost = delta(r['end_time'], r['start_time'], r['cost'])
-                                    # print type(a), type(b), r['start_time'], r['end_time'], ev1['start_time'], ev1[
-                                    #     'end_time'], r['cost'], "!2"
-                                    ev1['start_time'] = a
-                                    ev1['end_time'] = r['start_time']
-                                    event.append(ev1)
-                                    # print "отправка в обрезки ", ev1['start_time'], ev1['end_time'], r[
-                                    #     'start_time'], r['end_time'], r['cost'], delta, ev1['id']
-                                    ev1['start_time'] = r['end_time']
-                                    ev1['end_time'] = b
-                                    event.append(ev1)
-                                    # print "отправка в обрезки ", ev1['start_time'], ev1['end_time'], r[
-                                    #     'start_time'], r['end_time'], r['cost'], delta, ev1['id']
-                                elif a >= r['start_time']:
-                                    cost = delta(r['end_time'], a, r['cost'])
-                                    # a = int(r['end_time'])
-                                    ev1['start_time'] = a
-                                    ev1['end_time'] = b
-                                    event.append(ev1)
-                                    # print type(a), type(b), r['start_time'], r['end_time'], ev1['start_time'], ev1[
-                                    #     'end_time'], r['cost'], "!3"
-                                elif b <= r['end_time']:
-                                    print a, b, r['start_time'], r['end_time'], ev1['start_time'], ev1[
-                                        'end_time'], r['cost'], "4"
-                                    print type(a), type(b), type(r['start_time']), type(r['end_time']), type(
-                                        ev1['start_time']), type(ev1[
-                                                                     'end_time']), type(r['cost']), "!4"
-                                    cost = delta(b, r['start_time'], r['cost'])
-                                    # print "сумма за время арендованное по индив тарифам (4)", ind_rate_sum
-                                    ev1['start_time'] = a
-                                    ev1['end_time'] = r['start_time']
-                                    event.append(ev1)
-                                cost_counter = cost_counter + cost
-                                ind_rate_sum = ind_rate_sum + cost_counter
-                            event_lite.append(ev1)
+        up_ev = []
+        for l1 in event:
+            l1['orig_start_time'] = l1['start_time']# это фикс
+            if l1['start_time'] > 86400 and l1['end_time'] > 86400:
+                if l1['hall_id'] == int(hall_id):# and datetime.fromtimestamp(l1['start_time']).weekday() == int(r1['days_of_week'])
+                    # l1['name'] = str(r1['days_of_week'])
+                    l1['name'] = str(datetime.fromtimestamp(l1['orig_start_time']).weekday())
+                    # print "перед вычислением сдвига", l1['start_time'], l1['end_time'], l1['id']
+                    l1['start_time'] = (l1['start_time'] + 10800) % 86400 # смещение на 3 часа, необходимо, причина существования не ясна, возможно что-то с часовыми поясами                                                    #
+                    l1['end_time'] = (l1['end_time'] + 10800) % 86400
+                    # print "запись в up_ev", l1['start_time'], l1['end_time'], l1['id'], "_", l1['name']
+                    up_ev.append(l1)#сюда попадают занятия, с измененным временем, и с номером дня недели в названии
 
-        #                 elif ev1['name'] == str(r['days_of_week']):
-        #                     # print "ДЕНЬ  !!!!!!!! СОВПАЛ"
+        while len(up_ev) > 0: #пока занятия в списке
+            ev1 = up_ev.pop() #взятие последнего элемента списка
+            for r in comb_rate:#здесь по совпадающему залу, группе, дню недели, времени занятия и времени тарифа высчитывается стоимость
+                if r['group_id'] == l1['group_id']:
+                    tr = int(l1['name'])
+                    tr1 = int(r['days_of_week'])
+                    print "2/1", type(tr), type(tr1)
+                    if tr == tr1:
+                        print "совпало", tr, tr1
+                        a = ev1['start_time']
+                        b = ev1['end_time']
+                        if not b <= r['start_time'] and not a >= r['end_time']:
+                            print "есть пересечение !", r['id'], ev1['id'], ev1['name'], r['days_of_week']
+                            if a >= r['start_time'] and b <= r['end_time']:  # если соблюдается - сложить
+                                cost = delta(ev1['end_time'], ev1['start_time'], r['cost'])
+                                # print type(a), type(b), r['start_time'], r['end_time'], ev1['start_time'], ev1['end_time'], r['cost'], "!1"
+                            elif a < r['start_time'] and b > r['end_time']:
+                                cost = delta(r['end_time'], r['start_time'], r['cost'])
+                                ev1['end_time'] = r['end_time']
+                                event.append(ev1)
+                                ev1['start_time'] = r['end_time']
+                                ev1['end_time'] = b
+                                event.append(ev1)
+                            elif a >= r['start_time']:
+                                cost = delta(r['end_time'], a, r['cost'])
+                                ev1['start_time'] = r['end_time']
+                                event.append(ev1)
+                            else: #b <= r['end_time']
+                                # print a, b, r['start_time'], r['end_time'], ev1['start_time'], ev1[
+                                #     'end_time'], r['cost'], "4"
+                                # print type(a), type(b), type(r['start_time']), type(r['end_time']), type(
+                                #     ev1['start_time']), type(ev1[
+                                #                                  'end_time']), type(r['cost']), "!4"
+                                # print "сумма за время арендованное по индив тарифам (4)", ind_rate_sum
+                                cost = delta(b, r['start_time'], r['cost'])
+                                ev1['end_time'] = r['start_time']
+                                event.append(ev1)
+                            cost_counter = cost_counter + cost
+                            ind_rate_sum = ind_rate_sum + cost_counter
+                            print "инд тариф", ind_rate_sum
+                        else:
+                            event_lite.append(ev1)
+                    else:
+                        event_lite.append(ev1)
+                else:
+                    event_lite.append(ev1)
+        print "сумма по инд тарифам", ind_rate_sum
         #                     if not ev1['end_time'] <= r['start_time']:
         #                         if not ev1['start_time'] >= r['end_time']:
         #                             # print "пересечение в обрезках", ev1['start_time'], ev1['end_time'], r['start_time'], r[

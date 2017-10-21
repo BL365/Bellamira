@@ -122,8 +122,9 @@ class Renter:
                                 a = (c['start_time'] + 10800) % 86400
                                 b = (c['end_time'] + 10800) % 86400
                                 c['name'] = str(datetime.fromtimestamp(c['orig_start_time']).weekday())  # ФИКС
-                                print "проверка 1", c['start_time'], c['id'], a, b
-                                print "ПРОВЕРКА", c['name']  # WTF??
+                                print
+                                # print "проверка 1", c['start_time'], c['id'], a, b
+                                # print "ПРОВЕРКА", c['name']  # WTF??
                                 flag =+ 1
                             elif c['name'] == int(r['days_of_week']):
                                 a = c['start_time']
@@ -167,7 +168,8 @@ class Renter:
                                     cost_counter = cost_counter + cost
                                 ind_rate_sum = cost_counter  # сумма по задействованным инд тарифам
                                 print "сумма по индивидуальным тарифам", ind_rate_sum
-                            event_lite.append(c)
+                            else:
+                                event_lite.append(c)
 
         pub_rate_cost = 0
         zones = db.select('time_zone', vars=locals())
