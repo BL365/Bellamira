@@ -40,3 +40,7 @@ def getdropValues4():
     for d in days_of_week:
         dropValue.append((d["no"], d["name"]))
     return dropValue
+
+def delta (a, b, cost):
+    delta = a - b
+    return float(cost) / 3600 * delta
