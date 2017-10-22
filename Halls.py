@@ -68,27 +68,21 @@ class Hall():
         event_lite = []
         up_ev = []
         for l1 in event:
-            l1['orig_start_time'] = l1['start_time']
             if l1['start_time'] > 86400 and l1['end_time'] > 86400:
-                if l1['hall_id'] == int(hall_id):# and datetime.fromtimestamp(l1['start_time']).weekday() == int(r1['days_of_week'])
-                    # l1['name'] = str(r1['days_of_week'])
-                    l1['name'] = str(datetime.fromtimestamp(l1['orig_start_time']).weekday())
-                    # print "перед вычислением сдвига", l1['start_time'], l1['end_time'], l1['id']
+                if l1['hall_id'] == int(hall_id):
+                    l1['name'] = str(datetime.fromtimestamp(l1['start_time']).weekday())
                     l1['start_time'] = (l1['start_time'] + 10800) % 86400 # смещение на 3 часа, необходимо, причина существования не ясна, возможно что-то с часовыми поясами                                                    #
                     l1['end_time'] = (l1['end_time'] + 10800) % 86400
-                    # print "запись в up_ev", l1['start_time'], l1['end_time'], l1['id'], "_", l1['name']
                     up_ev.append(l1)#сюда попадают занятия, с измененным временем, и с номером дня недели в названии
 
         while len(up_ev) > 0: #пока занятия в списке
             ev1 = up_ev.pop() #взятие последнего элемента списка
             for r in comb_rate:#здесь по совпадающему залу, группе, дню недели, времени занятия и времени тарифа высчитывается стоимость
-                # print "запись в up_ev", ev1['id']
                 if r['group_id'] == ev1['group_id']:
                     if int(ev1['name']) == int(r['days_of_week']):
                         a = ev1['start_time']
                         b = ev1['end_time']
                         if not b <= r['start_time'] and not a >= r['end_time']:
-                            # print "есть пересечение !", r['id'], ev1['id'], "___", ev1['name'], r['days_of_week']
                             if a >= r['start_time'] and b <= r['end_time']:  # если соблюдается - сложить
                                 cost = delta(ev1['end_time'], ev1['start_time'], r['cost'])
                             elif a < r['start_time'] and b > r['end_time']:
@@ -109,12 +103,20 @@ class Hall():
                             ind_rate_sum = ind_rate_sum + cost
                             print "инд тариф", ind_rate_sum
                         else:
-                            event_lite.append(ev1)
+                            event_lite.append(ev1['id'])
                     else:
-                        event_lite.append(ev1)
+                        event_lite.append(ev1['id'])
                 else:
-                    event_lite.append(ev1)
+                    event_lite.append(ev1['id'])
         print "сумма по инд тарифам", ind_rate_sum
+
+        event_lite1 = set(event_lite)
+        print "тутати", len(event_lite1)
+        for av in event_lite1:
+            print av
+        # print "!", len(event_lite)
+        # for evl1 in event_lite:
+        #     print "запись в общих тарифах", evl1['id']
 
 
         pub_sum = 0
