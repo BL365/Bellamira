@@ -161,21 +161,21 @@ class Hall():
                         elif a < z1['start_time'] and b > z1['end_time']:
                             cost = delta(z1['end_time'], z1['start_time'], z1['cost'])
                             av[5] = z1['end_time']
-                            event_lite.append(av)
+                            event_lite1.append(av)
 
                             av[4] = z1['end_time']
                             av[5] = b
-                            event_lite.append(av)
+                            event_lite1.append(av)
 
                         elif a >= z1['start_time']:
                             cost = delta(z1['end_time'], a, z1['cost'])
                             av[4] = z1['end_time']
-                            event_lite.append(av)
+                            event_lite1.append(av)
 
                         else:  # av[5] <= z1['end_time']
                             cost = delta(b, z1['start_time'], z1['cost'])
                             av[5] = z1['start_time']
-                            event_lite.append(av)
+                            event_lite1.append(av)
 
                         pub_sum = pub_sum + cost
                         print "cost", cost
