@@ -43,4 +43,4 @@ def getdropValues4():
 
 def delta (a, b, cost):
     delta = a - b
-    return float(cost) / 3600 * delta
+    return round(float(cost) / 3600 * delta, 2)

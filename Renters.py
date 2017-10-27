@@ -63,22 +63,18 @@ class Renter:
                 e['end_time'] = datetime.fromtimestamp(e['end_time']).strftime("%d/%m/%Y (%a) %H:%M")
                 if e['renter'] == int(renter_id):
                     uppd_ev_groups.append(e)
-            # print "HERREEE ИТератор прошел цикл|"
+
         sum_pays = 0.0
         if pays != None:
             updeted_pays = []
-            # print "HEEEERREEEEEE ИТератор перед pays|"
             for p in pays:
                 sum_pays = sum_pays + float(p['sum'])
                 p['date'] = datetime.fromtimestamp(p['date']).strftime("%d/%m/%Y (%a) %H:%M")
                 updeted_pays.append(p)
 
-
         updated_rate = []
         for i in rate:
-            # print "начало  in rate|", type(i['days_of_week']), i['days_of_week']
             i['days_of_week'] = str(i['days_of_week'])
-            # print "после преобразования|", type(i['days_of_week']), i['days_of_week']
             hours = i['start_time'] / 3600
             minutes = i['start_time'] % 3600 / 60  # здесь время переводится в часы и минуты
             i['start_time'] = "%02d:%02d" % (hours, minutes)
@@ -86,16 +82,15 @@ class Renter:
             minutes = i['end_time'] % 3600 / 60
             i['end_time'] = "%02d:%02d" % (hours, minutes)
             for d in drop_hall:# здесь id заменяется названием
-                # print "цикл дроп-зал", type(d[0]), d[0], type(i['hall_id']), i['hall_id']
                 if d[0] == i['hall_id']:
                     i['hall_id'] = d[1]
                     updated_rate.append(i)# здесь формируется список тарифов, без замены дня недели с номера на сокращенное название
+
         updated_rate1 = list(updated_rate)
         updated_rate2 = []
         days = list(days)
         for up in updated_rate1:
-            # print type(days)
-            for dn in days:  # здесь номер дня недели тарифа заменяется названием. В этот цикл итератор заходит только 1 раз
+            for dn in days:# здесь номер дня недели тарифа заменяется названием
                 if type(dn['no']) != type(up['days_of_week']):
                     dn['no'] = str(dn['no'])
                 if up['days_of_week'] == dn['no']:
@@ -112,105 +107,132 @@ class Renter:
             for e in events: #это фикс
                 e['orig_start_time'] = e['start_time']
             cost_counter = 0
-            while len(events) > 0:
-                c = events.pop()
+
+            up_ev = []
+            for l1 in events:
+                if l1['start_time'] > 86400 and l1['end_time'] > 86400:
+                    l1['name'] = str(datetime.fromtimestamp(l1['start_time']).weekday())
+                    l1['start_time'] = (l1['start_time'] + 10800) % 86400
+                    l1['end_time'] = (l1['end_time'] + 10800) % 86400
+                    up_ev.append(l1)
+
+            ex_ev = []
+            while len(up_ev) > 0:
+                c = up_ev.pop()
                 for r in comb_rate:
                     if c['renter_id'] == int(renter_id) and c['renter_id'] == r['renter_id']:
-                        if c['group_id'] == r['group_id'] and c['hall_id'] == r['hall_id']:#тот ли зал
-                            flag = 0
-                            if datetime.fromtimestamp(c['start_time']).weekday() == int(r['days_of_week']):
-                                a = (c['start_time'] + 10800) % 86400
-                                b = (c['end_time'] + 10800) % 86400
-                                c['name'] = str(datetime.fromtimestamp(c['orig_start_time']).weekday())  # ФИКС
-                                print
-                                # print "проверка 1", c['start_time'], c['id'], a, b
-                                # print "ПРОВЕРКА", c['name']  # WTF??
-                                flag =+ 1
-                            elif c['name'] == int(r['days_of_week']):
+                        if c['group_id'] == r['group_id'] and c['hall_id'] == r['hall_id']:#тот ли зал, группа, арендатор
+                            if int(c['name']) == int(r['days_of_week']):
                                 a = c['start_time']
                                 b = c['end_time']
-                                print "проверка 2", c['start_time'], c['id'], a, b, c['name']
-                                flag =+ 1
-                            if flag != 0:
                                 if not b <= r['start_time'] and not a >= r['end_time']:
-                                    print "пересечение 1", c['start_time'], c['end_time'], a, b, r['start_time'], r['end_time'], c['id'], r['id']
-                                    if a >= r['start_time'] and b <= r['end_time']: #  сравнения только с внутрисуточным временем
+                                    if a >= r['start_time'] and b <= r['end_time']:
                                         cost = delta(b, a, r['cost'])
-                                        print "блок 1",  c['start_time'], c['end_time'], a, b, r['start_time'], r['end_time'], c['id'], r['id']
-                                        print cost
+                                        ex_ev.append(c)
                                     elif a < r['start_time'] and b > r['end_time']:
-                                        cost = delta(r['end_time'], r['start_time'], r['cost']) #  вычисления можно проводить с любым временем
+                                        cost = delta(r['end_time'], r['start_time'], r['cost'])
                                         c['start_time'] = a
-                                        c['end_time'] = r['start_time']                         #  как сохранять время?
+                                        c['end_time'] = r['start_time']
                                         events.append(c)
                                         c['start_time'] = r['end_time']
                                         c['end_time'] = b
                                         events.append(c)
-                                        print "блок 2", c['start_time'], c['end_time'], a, b, r['start_time'], r[
-                                            'end_time'], c['id'], r['id']
-                                        print cost
                                     elif a >= r['start_time']:
                                         cost = delta(r['end_time'], a, r['cost'])
                                         c['start_time'] = r['end_time']
                                         c['end_time'] = b
                                         events.append(c)
-                                        print "блок 3", c['start_time'], c['end_time'], a, b, r['start_time'], r[
-                                            'end_time'], c['id'], r['id']
-                                        print cost
                                     else:# b <= r['end_time']
                                         cost = delta(b, r['start_time'], r['cost'])
                                         c['end_time'] = r['start_time']
                                         c['start_time'] = a
                                         events.append(c)
-                                        print "блок 4", c['start_time'], c['end_time'], a, b, r['start_time'], r[
-                                            'end_time'], c['id'], r['id']
-                                        print cost
                                     cost_counter = cost_counter + cost
-                                ind_rate_sum = cost_counter  # сумма по задействованным инд тарифам
-                                print "сумма по индивидуальным тарифам", ind_rate_sum
+                                    ind_rate_sum = cost_counter  # сумма по задействованным инд тарифам
+                                    print "сумма по индивидуальным тарифам", ind_rate_sum
+                                else:
+                                    event_lite.append(c)
                             else:
                                 event_lite.append(c)
+                        else:
+                            event_lite.append(c)
+                    else:
+                        event_lite.append(c)
+
+        event_lite1 = []
+        while len(event_lite) > 0:  # перевод занятий-подсписков в формат кортежа из формата списка
+            e1 = event_lite.pop()
+            e1 = (e1['id'], e1['name'], e1['group_id'], e1['hall_id'], e1['start_time'], e1['end_time'])
+            event_lite1.append(e1)
+
+        del event_lite[:]
+        event_lite = []
+
+        event_lite1 = set(event_lite1)  # создание множества из списка занятий, для удаления дубликатов занятий
+        ex_ev1 = []
+        if len(ex_ev) > 0:
+            while len(ex_ev) > 0:# перевод занятий-подсписков в формат кортежа из формата списка
+                a1 = ex_ev.pop()
+                a1 = (a1['id'], a1['name'], a1['group_id'], a1['hall_id'], a1['start_time'], a1['end_time'])
+                ex_ev1.append(a1)
+            ex_ev1 = set(ex_ev1)
+            event_lite1 = event_lite1 - ex_ev1
+        event_lite1 = list(event_lite1)#перевод списка занятий из формата множества в список
+
+        for e2 in event_lite1:#перевод занятий из кортежа в список
+            e2 = list(e2)
+            event_lite.append(e2)
+        even_gr = db.query('SELECT  using_hall.[id], using_hall.[name], using_hall.[hall_id], using_hall.[group_id], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id], renters_group.[name] AS group_name, hall.[name] AS hall_name FROM renters_group INNER JOIN using_hall ON renters_group.[id] = using_hall.[group_id] INNER JOIN hall ON using_hall.[hall_id] = hall.[id]')
+        even_gr = list(even_gr)
+
+        del event_lite1[:]
+        event_lite1 = []
+
+        while event_lite:
+            e2 = event_lite.pop()
+            for gr2 in even_gr:
+                if len(e2) != 7:
+                    if int(e2[2]) == int(gr2['group_id']):
+                        e2.insert(6, gr2['renter_id'])
+            event_lite1.append(e2)
+
 
         pub_rate_cost = 0
         zones = db.select('time_zone', vars=locals())
-        while len(event_lite) > 0:
-            l = event_lite.pop()
+        zones = list(zones)
+        while len(event_lite1) > 0:
+            l = event_lite1.pop()
             for z in zones:
-                if l['hall_id'] == z['hall_id']:
-                    flag = 0
-                    if l['start_time'] > 86400:
-                        a = l['start_time']
-                        b = l['end_time']
-                        flag =+ 1
-                    elif datetime.fromtimestamp(l['start_time']).weekday() == int(z['days_of_week']):
-                        a = (l['start_time'] + 10800) % 86400
-                        b = (l['end_time'] + 10800) % 86400
-                        l['name'] = str(datetime.fromtimestamp(l['orig_start_time']).weekday())  # ФИКС
-                        flag =+ 1
-                    if flag != 0:
-                        if not b <= z['start_time'] and not a >= z['end_time']:
-                            if a >= z['start_time'] and b <= z['end_time']:
-                                cost = delta(l['end_time'], l['start_time'], z['cost'])
-                            elif a < z['start_time'] and b > z['end_time']:
-                                cost = delta(z['end_time'], z['start_time'], z['cost'])
-                                # print "сумма|", cost, l['id'], r['id']
-                                l['start_time'] = a
-                                l['end_time'] = z['start_time']
-                                event_lite.append(l)
-                                l['start_time'] = z['end_time']
-                                l['end_time'] = b
-                                event_lite.append(l)
-                            elif a >= z['start_time']:
-                                cost = delta(z['end_time'], a, z['cost'])
-                                l['start_time'] = z['end_time']
-                                l['end_time'] = b
-                                event_lite.append(l)
-                            else:# b <= z['end_time']
-                                cost = delta(b, z['start_time'], z['cost'])
-                                l['end_time'] = z['start_time']
-                                l['start_time'] = a
-                                event_lite.append(l)
-                            pub_rate_cost = pub_rate_cost + cost
+                if l[3] == z['hall_id'] and int(l[1]) == int(z['days_of_week']) and int(l[6]) == int(renter_id):
+                    a = l[4]
+                    b = l[5]
+                    if not b <= z['start_time'] and not a >= z['end_time']:
+                        if a >= z['start_time'] and b <= z['end_time']:
+                            cost = delta(b, a, z['cost'])
+                            print "1", l[0], z['id']
+                        elif a < z['start_time'] and b > z['end_time']:
+                            print "2", l[0], z['id']
+                            cost = delta(z['end_time'], z['start_time'], z['cost'])
+                            l[5] = z['start_time']
+                            event_lite.append(l)
+                            l[4] = z['end_time']
+                            l[5] = b
+                            event_lite.append(l)
+                        elif a >= z['start_time']:
+                            print "3", l[0], z['id']
+                            cost = delta(z['end_time'], a, z['cost'])
+                            l[4] = z['end_time']
+                            l[5] = b
+                            event_lite.append(l)
+                        else:# b <= z['end_time']
+                            print "4", l[0], z['id']
+                            cost = delta(b, z['start_time'], z['cost'])
+                            l[5] = z['start_time']
+                            event_lite.append(l)
+                        pub_rate_cost = pub_rate_cost + cost
+                        print "cost", cost
+                        print "сумма по общим тарифам", pub_rate_cost
+
 
         sum_cost = pub_rate_cost + ind_rate_sum
                    # print "сумма по общим тарифам"
@@ -232,7 +254,10 @@ class Renter:
         #     if s['days_of_week'] == "Вс":
         #         updated_rate3.append(s)
         balance = sum_pays - sum_cost
-        return render.renter(renter, renter_man, groups, people, updated_rate2, updeted_pays, uppd_ev_groups, form, form2, form3, form4, ind_rate_sum, sum_pays, balance)
+
+
+
+        return render.renter(renter, renter_man, groups, people, updated_rate2, updeted_pays, uppd_ev_groups, form, form2, form3, form4, sum_cost, sum_pays, balance)
 
     def POST(self, renter_id):
         print "ИТЕРАТОР В КЛАССЕ РЕНТЕР _ ПОСТ   "

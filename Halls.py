@@ -39,53 +39,34 @@ class Hall():
             hours = t['start_time'] / 3600
             minutes = t['start_time'] % 3600 / 60
             t['start_time'] = "%02d:%02d" % (hours, minutes)
-
             hours = t['end_time'] / 3600
             minutes = t['end_time'] % 3600 / 60
             t['end_time'] = "%02d:%02d" % (hours, minutes)
             updeted_zones.append(t)
-        # print zones[0]
 
         event = db.select('using_hall', order='start_time', where='hall_id=$hall_id', vars=locals())
-
-        # cost_table = db.query('SELECT using_hall.[hall_id], using_hall.[group_id], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id] AS RENTER, rate_renter.[days_of_week] AS DAYS_IND_RATE, rate_renter.[start_time] AS ST_T_IND_RATE, rate_renter.[end_time] AS EN_T_IND_RATE, rate_renter.[cost] AS IND_COST, time_zone.[days_of_week] AS DAYS_ST_RATE, time_zone.[start_time] AS ST_T_ST_RATE, time_zone.[end_time] AS EN_T_ST_RATE, time_zone.[cost] AS STAND_COST FROM using_hall INNER JOIN renters_group ON using_hall.[group_id] = renters_group.[id] INNER JOIN rate_renter ON renters_group.[renter_id] = rate_renter.[renter_id] INNER JOIN time_zone ON using_hall.[hall_id] = time_zone.[hall_id]')
-        # hall_cost_table = []        #sdelat sopostavlenie vremeni zaniatia i tarifa, raschet stoimosti
-        # for c in cost_table:
-        #     if c['hall_id'] == hall_id:
-        #         hall_cost_table.append(c)
         event = list(event)
-        # for ev in event:
-        #     # print "HEEEERREEEEEE в родительском цикле|", ev
-        #     ev['start_time'] = datetime.fromtimestamp(ev['start_time'])
-        #     ev['end_time'] = datetime.fromtimestamp(ev['end_time'])
-
         comb_rate = db.query('SELECT rate_renter.[id], rate_renter.[renter_id], rate_renter.[hall_id], rate_renter.[days_of_week], rate_renter.[start_time], rate_renter.[end_time], rate_renter.[cost], renters_group.[id] AS group_id FROM rate_renter INNER JOIN renters_group ON rate_renter.[renter_id] = renters_group.[renter_id]')
         # comb_rate создано для возможности сопоставления группы и индивидуального тарифа
         comb_rate = list(comb_rate)
         ind_rate_sum = 0
-        # updeted_zones1 = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
-        # updeted_zones1 = list(updeted_zones1)
-
-
 
         event_lite = []
-
         up_ev = []
         for l1 in event:
             if l1['start_time'] > 86400 and l1['end_time'] > 86400:
-                if l1['hall_id'] == int(hall_id):
-                    l1['name'] = str(datetime.fromtimestamp(l1['start_time']).weekday())
-                    l1['start_time'] = (l1['start_time'] + 10800) % 86400 # смещение на 3 часа, необходимо, причина существования не ясна, возможно что-то с часовыми поясами                                                    #
-                    l1['end_time'] = (l1['end_time'] + 10800) % 86400 #перевод времени из unix в секунды от начала суток
-                    up_ev.append(l1)#сюда попадают занятия, с измененным временем, и с номером дня недели в названии
-
-
+                # if l1['hall_id'] == int(hall_id):
+                l1['name'] = str(datetime.fromtimestamp(l1['start_time']).weekday())
+                l1['start_time'] = (l1['start_time'] + 10800) % 86400 # смещение на 3 часа, необходимо, причина существования не ясна, возможно что-то с часовыми поясами                                                    #
+                l1['end_time'] = (l1['end_time'] + 10800) % 86400 #перевод времени из unix в секунды от начала суток
+                up_ev.append(l1)#сюда попадают занятия, с измененным временем, и с номером дня недели в названии
 
         ex_ev = []
         while len(up_ev) > 0: #пока занятия в списке
             ev1 = up_ev.pop() #взятие последнего элемента списка
+            print "start STR", ev1['id']
             for r in comb_rate:#здесь по совпадающему залу, группе, дню недели, времени занятия и времени тарифа высчитывается стоимость
-                if r['group_id'] == ev1['group_id']:
+                if r['group_id'] == ev1['group_id'] and int(r['hall_id']) == int(ev1['hall_id']):
                     if int(ev1['name']) == int(r['days_of_week']):
                         a = ev1['start_time']
                         b = ev1['end_time']
@@ -109,16 +90,15 @@ class Hall():
                                 ev1['end_time'] = r['start_time']
                                 up_ev.append(ev1)
                             ind_rate_sum = ind_rate_sum + cost
-                            # print "инд тариф", ind_rate_sum
                         else:
                             event_lite.append(ev1)
                     else:
                         event_lite.append(ev1)
                 else:
                     event_lite.append(ev1)
-        # print "сумма по инд тарифам", ind_rate_sum
+
         event_lite1 = []
-        while event_lite:#перевод занятий-подсписков в формат кортежа из формата списка
+        while len(event_lite) > 0:#перевод занятий-подсписков в формат кортежа из формата списка
             e1 = event_lite.pop()
             e1 = (e1['id'], e1['name'], e1['group_id'], e1['hall_id'], e1['start_time'], e1['end_time'])
             event_lite1.append(e1)
@@ -144,46 +124,32 @@ class Hall():
         pub_sum = 0
         while len(event_lite1) > 0:
             av = event_lite1.pop()
-            # print "id занятия в общих ", av[0]
-            # print av[0],"__", av[4], "-", av[5]
             for z1 in zones1:
-                # print "id в общих ", av[0]# , z1['id'], av[1], z1['days_of_week']
-                if int(av[1]) == int(z1['days_of_week']):
-                    # print "совпал день", av[1], z1['days_of_week'], av[0], z1['id']
-                    # print z1['start_time'], "-", z1['end_time']
+                if int(av[1]) == int(z1['days_of_week']) and int(av[3]) == int(z1['hall_id']):
                     if not av[5] <= z1['start_time'] and not av[4] >= z1['end_time']:
-                        print "совпадение времени ", av[0], z1['id'], av[4],av[5], z1['start_time'], z1['end_time']
                         a = av[4]
                         b = av[5]
                         if a >= z1['start_time'] and b <= z1['end_time']:
                             cost = delta(b, a, z1['cost'])
-
                         elif a < z1['start_time'] and b > z1['end_time']:
                             cost = delta(z1['end_time'], z1['start_time'], z1['cost'])
                             av[5] = z1['end_time']
                             event_lite1.append(av)
-
                             av[4] = z1['end_time']
                             av[5] = b
                             event_lite1.append(av)
-
                         elif a >= z1['start_time']:
                             cost = delta(z1['end_time'], a, z1['cost'])
                             av[4] = z1['end_time']
                             event_lite1.append(av)
-
                         else:  # av[5] <= z1['end_time']
                             cost = delta(b, z1['start_time'], z1['cost'])
                             av[5] = z1['start_time']
                             event_lite1.append(av)
-
                         pub_sum = pub_sum + cost
-                        print "cost", cost
+                        # print "cost", cost
                         print "pub_sum", pub_sum
-
-
         sum = ind_rate_sum + pub_sum
-        # print "sum", sum
 
         updeted_events = []
         for e in events:
@@ -193,7 +159,6 @@ class Hall():
                 if t[0] == e['group_id']:
                     e['group_id'] = t[1]
                     updeted_events.append(e)
-
 
         return render.prices(hall, updeted_zones, form, form2, updeted_events, ind_rate_sum, pub_sum, sum)
 
