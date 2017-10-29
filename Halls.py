@@ -51,7 +51,7 @@ class Hall():
         comb_rate = list(comb_rate)
         ind_rate_sum = 0
 
-        event_lite = []
+        # event_lite = []
         up_ev = []
         for l1 in event:
             if l1['start_time'] > 86400 and l1['end_time'] > 86400:
@@ -60,36 +60,70 @@ class Hall():
                 l1['start_time'] = (l1['start_time'] + 10800) % 86400 # смещение на 3 часа, необходимо, причина существования не ясна, возможно что-то с часовыми поясами                                                    #
                 l1['end_time'] = (l1['end_time'] + 10800) % 86400 #перевод времени из unix в секунды от начала суток
                 up_ev.append(l1)#сюда попадают занятия, с измененным временем, и с номером дня недели в названии
+        #del event[:]
 
+        up_ev1 = []
+        while len(up_ev) > 0:  # перевод занятий-подсписков в формат кортежа из формата списка
+            e1 = up_ev.pop()
+            e1 = (e1['id'], e1['name'], e1['group_id'], e1['hall_id'], e1['start_time'], e1['end_time'])
+            up_ev1.append(e1)
+        print "up_ev1 LEN", len(up_ev1)
+        del up_ev[:]
+        event_lite = []
         ex_ev = []
-        while len(up_ev) > 0: #пока занятия в списке
-            ev1 = up_ev.pop() #взятие последнего элемента списка
-            print "start STR", ev1['id']
+        while len(up_ev1) > 0: #пока занятия в списке
+            print "весь up_ev1", up_ev1
+            ev1 = up_ev1.pop() #взятие последнего элемента списка
+
+            print "up_ev1 LEN", len(up_ev1), ev1[0], ev1[4], ev1[5]
+
             for r in comb_rate:#здесь по совпадающему залу, группе, дню недели, времени занятия и времени тарифа высчитывается стоимость
-                if r['group_id'] == ev1['group_id'] and int(r['hall_id']) == int(ev1['hall_id']):
-                    if int(ev1['name']) == int(r['days_of_week']):
-                        a = ev1['start_time']
-                        b = ev1['end_time']
+                # if int(ev1[0]) == 13:
+                    # print "ИНДИВИДЫ второго порядка", ev1[4], ev1[5]
+                if r['group_id'] == ev1[2] and int(r['hall_id']) == int(ev1[3]):
+                    if int(ev1[1]) == int(r['days_of_week']):
+                        a = ev1[4]
+                        b = ev1[5]
                         if not b <= r['start_time'] and not a >= r['end_time']:
-                            if a >= r['start_time'] and b <= r['end_time']:  # если соблюдается - сложить
-                                cost = delta(ev1['end_time'], ev1['start_time'], r['cost'])
+                            # print "занятие, расчет индивидуальных", ev1
+                            if a >= r['start_time'] and b <= r['end_time']:  # время внутри тарифа
+                                cost = delta(ev1[5], ev1[4], r['cost'])
                                 ex_ev.append(ev1)
+                                print "блок 1"
                             elif a < r['start_time'] and b > r['end_time']:
+                                print "блок2"
+                                if int(ev1[0]) == 13:
+                                    print "13ое занятие, расчет индивидуальных блок2", ev1
                                 cost = delta(r['end_time'], r['start_time'], r['cost'])
-                                ev1['end_time'] = r['end_time']
-                                up_ev.append(ev1)
-                                ev1['start_time'] = r['end_time']
-                                ev1['end_time'] = b
-                                up_ev.append(ev1)
+
+                                tz2 = (ev1[0], ev1[1], ev1[2], ev1[3], ev1[4], r['start_time'])
+                                up_ev1.append(tz2)
+
+                                if int(ev1[0]) == 13:
+                                    print "отправка tz2", tz2
+                                del tz2
+                                tz = (ev1[0], ev1[1], ev1[2], ev1[3], r['end_time'], ev1[5])
+                                up_ev1.append(tz)
+                                if int(ev1[0]) == 13:
+                                    print "отправка tz", tz
+                                del tz
                             elif a >= r['start_time']:
                                 cost = delta(r['end_time'], a, r['cost'])
-                                ev1['start_time'] = r['end_time']
-                                up_ev.append(ev1)
+                                tz = (ev1[0], ev1[1], ev1[2], ev1[3], r['end_time'], ev1[5])
+                                # print "отправка обрезков", ev1[4], ev1[5]
+                                up_ev1.append(tz)
+                                del tz
+                                print "блок 3"
                             else: #b <= r['end_time']
                                 cost = delta(b, r['start_time'], r['cost'])
-                                ev1['end_time'] = r['start_time']
-                                up_ev.append(ev1)
+                                tz = (ev1[0], ev1[1], ev1[2], ev1[3], ev1[4], r['start_time'])
+                                # print "отправка обрезков", ev1['start_time'], ev1['end_time']
+                                up_ev1.append(tz)
+                                del tz
+                                print "блок 4"
                             ind_rate_sum = ind_rate_sum + cost
+                            print cost
+                            break
                         else:
                             event_lite.append(ev1)
                     else:
@@ -97,36 +131,37 @@ class Hall():
                 else:
                     event_lite.append(ev1)
 
-        event_lite1 = []
-        while len(event_lite) > 0:#перевод занятий-подсписков в формат кортежа из формата списка
-            e1 = event_lite.pop()
-            e1 = (e1['id'], e1['name'], e1['group_id'], e1['hall_id'], e1['start_time'], e1['end_time'])
-            event_lite1.append(e1)
-
-        del event_lite[:]
-        event_lite = []
-        event_lite1 = set(event_lite1)#создание множества из списка занятий, для удаления дубликатов занятий
+        event_lite = set(event_lite)#создание множества из списка занятий, для удаления дубликатов занятий
+        for i1111 in event_lite:
+            if i1111[0] == 13:
+                print "13ый кортеж в event_lite", i1111[0], i1111[4], i1111[5]
         ex_ev1 = []
         if len(ex_ev) > 0:
-            while ex_ev:# перевод занятий-подсписков в формат кортежа из формата списка
-                a1 = ex_ev.pop()
-                a1 = (a1['id'], a1['name'], a1['group_id'], a1['hall_id'], a1['start_time'], a1['end_time'])
-                ex_ev1.append(a1)
-            ex_ev1 = set(ex_ev1)
-            event_lite1 = event_lite1 - ex_ev1
-        event_lite1 = list(event_lite1)#перевод списка занятий из формата множества в список
-        for e2 in event_lite1:#перевод занятий из кортежа в список
+            # while ex_ev:# перевод занятий-подсписков в формат кортежа из формата списка
+            #     a1 = ex_ev.pop()
+            #     a1 = (a1['id'], a1['name'], a1['group_id'], a1['hall_id'], a1['start_time'], a1['end_time'])
+            #     ex_ev1.append(a1)
+            ex_ev = set(ex_ev)
+            event_lite = event_lite - ex_ev
+        event_lite = list(event_lite)#перевод списка занятий из формата множества в список
+        event_lite1 = []
+        for e2 in event_lite:#перевод занятий из кортежа в список
             e2 = list(e2)
-            event_lite.append(e2)
-
+            event_lite1.append(e2)
+        # del event_lite[:]
         zones1 = db.select('time_zone', where='hall_id=$hall_id', vars=locals())
         zones1 = list(zones1)
         pub_sum = 0
+        # del event_lite1[:]
+        # event_lite1 = []
+        # event_lite1 = lite_ev
         while len(event_lite1) > 0:
             av = event_lite1.pop()
             for z1 in zones1:
                 if int(av[1]) == int(z1['days_of_week']) and int(av[3]) == int(z1['hall_id']):
                     if not av[5] <= z1['start_time'] and not av[4] >= z1['end_time']:
+                        if av[0] == 13:
+                            print "13ое занятие подсчет в общих----------------------------------------"
                         a = av[4]
                         b = av[5]
                         if a >= z1['start_time'] and b <= z1['end_time']:
@@ -147,7 +182,7 @@ class Hall():
                             av[5] = z1['start_time']
                             event_lite1.append(av)
                         pub_sum = pub_sum + cost
-                        # print "cost", cost
+                        print "cost", cost
                         print "pub_sum", pub_sum
         sum = ind_rate_sum + pub_sum
 

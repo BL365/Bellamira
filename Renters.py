@@ -275,7 +275,7 @@ class Renter:
             raise web.seeother('/renter/' + str(renter_id) + "/", True)
 
 
-        if form.d.name != "занятие" and form.d.drop8 != "-1" and form.d.drop8 != -1 and form.d.name != "занятие":
+        if form.d.drop8 != None and form.d.drop8 != -1 and form.d.name != None:
             print "HEEEEEEEEEEEEEEEEEERRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEE FORM1111111 !!!!!!!!!", form.d.name, form.d.drop8
             people_id = getNextId('people')
             # print "HERE!!!", type(form.d.other), form.d.other
@@ -367,7 +367,7 @@ class Renter:
         # print form3.d.end_time
         # print form3.d.name
 
-
+        # print "form3 значения", form3.d.start_time, form3.d.end_time, form3.d.name
         if form3.d.start_time != None and form3.d.end_time != None and form3.d.name != None:
             if form3.d.drop != "-1" and form3.d.drop2 != "-1":
                 start_dt_string2 = datetime.strptime(form3.d.start_time, "%d/%m/%Y %H:%M")
