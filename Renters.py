@@ -97,59 +97,91 @@ class Renter:
                     up['days_of_week'] = dn['name']
                     updated_rate2.append(up)
 
-        event_lite = []
+
         ind_rate_sum = 0
         events = db.query('SELECT using_hall.[id], using_hall.[group_id], using_hall.[hall_id], using_hall.[name], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id] FROM using_hall INNER JOIN renters_group ON using_hall.[group_id] = renters_group.[id]')
         comb_rate = db.query('SELECT rate_renter.[id], rate_renter.[renter_id], rate_renter.[hall_id], rate_renter.[days_of_week], rate_renter.[start_time], rate_renter.[end_time], rate_renter.[cost], renters_group.[id] AS group_id FROM rate_renter INNER JOIN renters_group ON rate_renter.[renter_id] = renters_group.[renter_id]')
         comb_rate = list(comb_rate)
-        if comb_rate != None:
+
+        event_lite = []
+        ex_ev = []
+
+        if comb_rate != None and events != None:
             events = list(events)
+            up_ev = []
+
+            even_gr = db.query(
+                'SELECT  using_hall.[id], using_hall.[name], using_hall.[hall_id], using_hall.[group_id], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id], renters_group.[name] AS group_name, hall.[name] AS hall_name FROM renters_group INNER JOIN using_hall ON renters_group.[id] = using_hall.[group_id] INNER JOIN hall ON using_hall.[hall_id] = hall.[id]')
+            even_gr = list(even_gr)
+
             for e in events: #это фикс
                 e['orig_start_time'] = e['start_time']
-            cost_counter = 0
+                if e['start_time'] > 86400 and e['end_time'] > 86400:
+                    e['name'] = str(datetime.fromtimestamp(e['start_time']).weekday())
+                    e['start_time'] = (e['start_time'] + 10800) % 86400
+                    e['end_time'] = (e['end_time'] + 10800) % 86400
+                    up_ev.append(e)
 
+            up_ev1 = []
+            while up_ev:
+                e2 = up_ev.pop()
+                for gr2 in even_gr:
+                    print "HEREEEEEE 1"
+                    if len(e2) != 8:
+                        print "HERE", type(e2), e2
+                        if int(e2['group_id']) == int(gr2['group_id']):
+                            e2 = [e2['id'], e2['name'], e2['group_id'], e2['hall_id'], e2['start_time'], e2['end_time'], e2['orig_start_time']]
+                            e2 = list(e2)
+                            e2.append(gr2['renter_id'])
+                up_ev1.append(e2)
+
+            del up_ev[:]
             up_ev = []
-            for l1 in events:
-                if l1['start_time'] > 86400 and l1['end_time'] > 86400:
-                    l1['name'] = str(datetime.fromtimestamp(l1['start_time']).weekday())
-                    l1['start_time'] = (l1['start_time'] + 10800) % 86400
-                    l1['end_time'] = (l1['end_time'] + 10800) % 86400
-                    up_ev.append(l1)
-
-            ex_ev = []
+            while len(up_ev1) > 0:
+                e1 = up_ev1.pop()
+                e1 = (e1['id'], e1['name'], e1['group_id'], e1['hall_id'], e1['start_time'], e1['end_time'], e1['orig_start_time'], e1['renter_id'])
+                up_ev.append(e1)
             while len(up_ev) > 0:
                 c = up_ev.pop()
                 for r in comb_rate:
-                    if c['renter_id'] == int(renter_id) and c['renter_id'] == r['renter_id']:
-                        if c['group_id'] == r['group_id'] and c['hall_id'] == r['hall_id']:#тот ли зал, группа, арендатор
-                            if int(c['name']) == int(r['days_of_week']):
-                                a = c['start_time']
-                                b = c['end_time']
+                    if c[7] == int(renter_id) and c[7] == r['renter_id']:
+                        if c[2] == r['group_id'] and c[3] == r['hall_id']:#тот ли зал, группа, арендатор
+                            if int(c[1]) == int(r['days_of_week']):
+                                a = c[4]
+                                b = c[5]
                                 if not b <= r['start_time'] and not a >= r['end_time']:
+                                    ex_ev.append(c)
+                                    print "блок 0", c[0]
                                     if a >= r['start_time'] and b <= r['end_time']:
                                         cost = delta(b, a, r['cost'])
-                                        ex_ev.append(c)
+                                        print "блок 1"
                                     elif a < r['start_time'] and b > r['end_time']:
                                         cost = delta(r['end_time'], r['start_time'], r['cost'])
-                                        c['start_time'] = a
-                                        c['end_time'] = r['start_time']
-                                        events.append(c)
-                                        c['start_time'] = r['end_time']
-                                        c['end_time'] = b
-                                        events.append(c)
+
+                                        tz = (c[0], c[1], c[2], c[3], c[4], r['start_time'], c[6], c[7])
+                                        up_ev.append(tz)
+                                        del tz
+                                        tz = (c[0], c[1], c[2], c[3], r['end_time'], c[5], c[6], c[7])
+                                        up_ev.append(tz)
+                                        del tz
+                                        print "блок 2"
                                     elif a >= r['start_time']:
                                         cost = delta(r['end_time'], a, r['cost'])
-                                        c['start_time'] = r['end_time']
-                                        c['end_time'] = b
-                                        events.append(c)
+                                        tz = (c[0], c[1], c[2], c[3], r['end_time'], c[5], c[6], c[7])
+                                        up_ev.append(tz)
+                                        del tz
+                                        print "блок 3"
                                     else:# b <= r['end_time']
                                         cost = delta(b, r['start_time'], r['cost'])
-                                        c['end_time'] = r['start_time']
-                                        c['start_time'] = a
-                                        events.append(c)
-                                    cost_counter = cost_counter + cost
-                                    ind_rate_sum = cost_counter  # сумма по задействованным инд тарифам
+                                        tz = (c[0], c[1], c[2], c[3], c[4], r['start_time'], c[6], c[7])
+                                        up_ev.append(tz)
+                                        del tz
+                                        print "блок 4"
+                                    ind_rate_sum = ind_rate_sum + cost
+                                    print cost
+                                    # ind_rate_sum = cost_counter  # сумма по задействованным инд тарифам
                                     print "сумма по индивидуальным тарифам", ind_rate_sum
+                                    break
                                 else:
                                     event_lite.append(c)
                             else:
@@ -158,55 +190,46 @@ class Renter:
                             event_lite.append(c)
                     else:
                         event_lite.append(c)
+        # if ind_rate_sum != 0:
+
+        # event_lite1 = []
+        # while len(event_lite) > 0:  # перевод занятий-подсписков в формат кортежа из формата списка
+        #     e1 = event_lite.pop()
+        #     e1 = (e1['id'], e1['name'], e1['group_id'], e1['hall_id'], e1['start_time'], e1['end_time'])
+        #     event_lite1.append(e1)
+        #
+        # del event_lite[:]
+        # event_lite = []
+
+        event_lite = set(event_lite)  # создание множества из списка занятий, для удаления дубликатов занятий
+
+        ex_ev = set(ex_ev)
+        event_lite = event_lite - ex_ev
+        event_lite = list(event_lite)#перевод списка занятий из формата множества в список
 
         event_lite1 = []
-        while len(event_lite) > 0:  # перевод занятий-подсписков в формат кортежа из формата списка
-            e1 = event_lite.pop()
-            e1 = (e1['id'], e1['name'], e1['group_id'], e1['hall_id'], e1['start_time'], e1['end_time'])
-            event_lite1.append(e1)
 
-        del event_lite[:]
-        event_lite = []
-
-        event_lite1 = set(event_lite1)  # создание множества из списка занятий, для удаления дубликатов занятий
-        ex_ev1 = []
-        if len(ex_ev) > 0:
-            while len(ex_ev) > 0:# перевод занятий-подсписков в формат кортежа из формата списка
-                a1 = ex_ev.pop()
-                a1 = (a1['id'], a1['name'], a1['group_id'], a1['hall_id'], a1['start_time'], a1['end_time'])
-                ex_ev1.append(a1)
-            ex_ev1 = set(ex_ev1)
-            event_lite1 = event_lite1 - ex_ev1
-        event_lite1 = list(event_lite1)#перевод списка занятий из формата множества в список
-
-        for e2 in event_lite1:#перевод занятий из кортежа в список
+        for e2 in event_lite:#перевод занятий из кортежа в список
             e2 = list(e2)
-            event_lite.append(e2)
-        even_gr = db.query('SELECT  using_hall.[id], using_hall.[name], using_hall.[hall_id], using_hall.[group_id], using_hall.[start_time], using_hall.[end_time], renters_group.[renter_id], renters_group.[name] AS group_name, hall.[name] AS hall_name FROM renters_group INNER JOIN using_hall ON renters_group.[id] = using_hall.[group_id] INNER JOIN hall ON using_hall.[hall_id] = hall.[id]')
-        even_gr = list(even_gr)
-
-        del event_lite1[:]
-        event_lite1 = []
-
-        while event_lite:
-            e2 = event_lite.pop()
-            for gr2 in even_gr:
-                if len(e2) != 7:
-                    if int(e2[2]) == int(gr2['group_id']):
-                        e2.insert(6, gr2['renter_id'])
             event_lite1.append(e2)
+
 
 
         pub_rate_cost = 0
         zones = db.select('time_zone', vars=locals())
         zones = list(zones)
+        # print "1"
         while len(event_lite1) > 0:
             l = event_lite1.pop()
+            # print "2"
             for z in zones:
-                if l[3] == z['hall_id'] and int(l[1]) == int(z['days_of_week']) and int(l[6]) == int(renter_id):
+                # print "3", l[3], type(l[3]), z['hall_id'], type(z['hall_id']),
+                if l[3] == z['hall_id'] and int(l[1]) == int(z['days_of_week']) and int(l[7]) == int(renter_id):
+                    # print "4"
                     a = l[4]
                     b = l[5]
                     if not b <= z['start_time'] and not a >= z['end_time']:
+                        # print "5"
                         if a >= z['start_time'] and b <= z['end_time']:
                             cost = delta(b, a, z['cost'])
                             print "1", l[0], z['id']
@@ -257,7 +280,7 @@ class Renter:
 
 
 
-        return render.renter(renter, renter_man, groups, people, updated_rate2, updeted_pays, uppd_ev_groups, form, form2, form3, form4, sum_cost, sum_pays, balance)
+        return render.renter(renter, renter_man, groups, people, updated_rate2, updeted_pays, uppd_ev_groups, form, form2, form3, form4, sum_cost, sum_pays, balance,  pub_rate_cost, ind_rate_sum)
 
     def POST(self, renter_id):
         print "ИТЕРАТОР В КЛАССЕ РЕНТЕР _ ПОСТ   "

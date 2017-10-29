@@ -1,4 +1,4 @@
-$def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form2, form3, form4, rate_sum, sum_pays, balance)
+$def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form2, form3, form4, rate_sum, sum_pays, balance, pub_rate_cost, ind_rate_sum)
 <script type="text/javascript" src="/static/jquery.js"></script>
 <script type="text/javascript" src="/static/prices_script.js"></script>
 <table width="100%" border="0" align="left">
@@ -46,11 +46,15 @@ $def with (renter, renter_man, groups, people, rate, pays, ev_groups, form, form
             <h3>Финансовая сводка</h3>
             <table border="0" bordercolor="000000" cellspacing="2">
                 <tr>
+                    <th bgcolor="03a2d3">Сумма по инд тарифам</th>
+                    <th bgcolor="03a2d3">Сумма по общ тарифам</th>
                     <th bgcolor="03a2d3">Суммарная выплата</th>
                     <th bgcolor="03a2d3">Суммарная стоимость занятий</th>
                     <th bgcolor="03a2d3">Итоговый баланс</th>
                 </tr>
                 <tr>
+                    <td bgcolor="afcde7">$ind_rate_sum руб</td>
+                    <td bgcolor="afcde7">$pub_rate_cost руб</td>
                     <td bgcolor="afcde7">$sum_pays руб</td>
                     <td bgcolor="afcde7">$rate_sum руб</td>
                     <td bgcolor="afcde7">$balance руб</td>
