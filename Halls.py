@@ -86,9 +86,9 @@ class Hall():
                         b = ev1[5]
                         if not b <= r['start_time'] and not a >= r['end_time']:
                             # print "занятие, расчет индивидуальных", ev1
+                            ex_ev.append(ev1)
                             if a >= r['start_time'] and b <= r['end_time']:  # время внутри тарифа
                                 cost = delta(ev1[5], ev1[4], r['cost'])
-                                ex_ev.append(ev1)
                                 print "блок 1"
                             elif a < r['start_time'] and b > r['end_time']:
                                 print "блок2"
@@ -132,9 +132,7 @@ class Hall():
                     event_lite.append(ev1)
 
         event_lite = set(event_lite)#создание множества из списка занятий, для удаления дубликатов занятий
-        for i1111 in event_lite:
-            if i1111[0] == 13:
-                print "13ый кортеж в event_lite", i1111[0], i1111[4], i1111[5]
+
         ex_ev1 = []
         if len(ex_ev) > 0:
             # while ex_ev:# перевод занятий-подсписков в формат кортежа из формата списка
@@ -143,6 +141,9 @@ class Hall():
             #     ex_ev1.append(a1)
             ex_ev = set(ex_ev)
             event_lite = event_lite - ex_ev
+        for i1111 in event_lite:
+            if i1111[0] == 13:
+                print "13ый кортеж в event_lite", i1111[0], i1111[4], i1111[5]
         event_lite = list(event_lite)#перевод списка занятий из формата множества в список
         event_lite1 = []
         for e2 in event_lite:#перевод занятий из кортежа в список
